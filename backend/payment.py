@@ -150,7 +150,6 @@ async def squad_webhook(
     #     if not hmac.compare_digest(computed, x_squad_encrypted_body):
     #         print("Invalid webhook signature — rejected")
     #         return {"status": "rejected", "reason": "invalid signature"}
-
     if x_squad_encrypted_body:
         computed = hmac.new(
             Config.SQUAD_SECRET_KEY.encode("utf-8"),

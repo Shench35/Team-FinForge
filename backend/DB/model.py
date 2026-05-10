@@ -14,3 +14,4 @@ class Transaction(SQLModel, table=True):
     status: str = Field(default="pending")
     created_at: datetime = Field(default_factory=datetime.utcnow)
     paid_at: datetime | None = Field(default=None)
+    

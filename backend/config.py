@@ -7,7 +7,8 @@ class Settings(BaseSettings):
 
     SQUAD_SECRET_KEY:str
     SQUAD_BASE_URL:str = "https://sandbox-api-d.squadco.com"
-    DATABASE_URL: str
+    DATABASE_URL:str
+    GEMINI_API_KEY:str
 
 
     model_config = SettingsConfigDict(

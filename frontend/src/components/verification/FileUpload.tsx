@@ -182,9 +182,7 @@ export const FileUpload = ({
                 <div className="flex-shrink-0">
                   {uploadedFile.file.type === "application/pdf" ? (
                     <div className="flex h-8 w-8 items-center justify-center rounded bg-error/10">
-                      <span className="text-xs font-bold text-error">
-                        PDF
-                      </span>
+                      <span className="text-xs font-bold text-error">PDF</span>
                     </div>
                   ) : (
                     <div className="flex h-8 w-8 items-center justify-center rounded bg-secondary/10">

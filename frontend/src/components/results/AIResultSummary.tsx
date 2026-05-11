@@ -33,10 +33,7 @@ export const AIResultSummary = ({
   const config = verdictConfig[verdict];
 
   return (
-    <Card
-      elevated
-      className={`space-y-6 p-8 ${config.borderColor}`}
-    >
+    <Card elevated className={`space-y-6 p-8 ${config.borderColor}`}>
       {/* Score Ring */}
       <div className="flex justify-center">
         <TrustScoreRing score={trustScore} animated={true} />
@@ -44,9 +41,7 @@ export const AIResultSummary = ({
 
       {/* Verdict Info */}
       <div className="space-y-4 text-center">
-        <h2 className="text-2xl font-bold text-on-surface">
-          {config.title}
-        </h2>
+        <h2 className="text-2xl font-bold text-on-surface">{config.title}</h2>
         <VerdictBadge verdict={verdict} size="md" />
       </div>
 
@@ -55,16 +50,12 @@ export const AIResultSummary = ({
         <p className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
           AI Summary
         </p>
-        <p className="text-sm text-on-surface">
-          {aiSummary}
-        </p>
+        <p className="text-sm text-on-surface">{aiSummary}</p>
       </div>
 
       {/* File Info */}
       <div className="rounded-lg bg-surface-container-low p-3">
-        <p className="text-xs text-on-surface-variant">
-          Document verified:
-        </p>
+        <p className="text-xs text-on-surface-variant">Document verified:</p>
         <p className="truncate font-mono text-sm font-medium text-on-surface">
           {fileName}
         </p>

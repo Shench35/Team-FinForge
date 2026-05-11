@@ -27,31 +27,22 @@ export const AnomalyItem = ({
     <Card className="space-y-3 p-4">
       <div className="flex items-start gap-3">
         {/* Icon */}
-        <div className="flex-shrink-0 pt-0.5">
-          {iconMap[severity]}
-        </div>
+        <div className="flex-shrink-0 pt-0.5">{iconMap[severity]}</div>
 
         {/* Content */}
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <h4 className="font-semibold text-on-surface">
-              {fieldName}
-            </h4>
+            <h4 className="font-semibold text-on-surface">{fieldName}</h4>
             <SeverityBadge severity={severity} size="sm" />
           </div>
 
-          <p className="mt-2 text-sm text-on-surface-variant">
-            {description}
-          </p>
+          <p className="mt-2 text-sm text-on-surface-variant">{description}</p>
 
           {/* Footer Info */}
           <div className="mt-3 flex items-center justify-between">
             {confidence !== undefined && (
               <p className="text-xs text-on-surface-variant">
-                Confidence:{" "}
-                <span className="font-semibold">
-                  {confidence}%
-                </span>
+                Confidence: <span className="font-semibold">{confidence}%</span>
               </p>
             )}
             {anomalyId && (

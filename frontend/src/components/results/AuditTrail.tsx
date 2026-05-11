@@ -65,9 +65,7 @@ export const AuditTrail = ({
         <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
           Security & Compliance
         </p>
-        <h3 className="text-lg font-semibold text-on-surface">
-          Audit Trail
-        </h3>
+        <h3 className="text-lg font-semibold text-on-surface">Audit Trail</h3>
       </div>
 
       {/* Events Timeline */}
@@ -76,7 +74,11 @@ export const AuditTrail = ({
           <div key={index} className="flex gap-4">
             {/* Icon */}
             <div className="flex-shrink-0">
-              {event.icon ? iconMap[event.icon] : <Clock className="h-5 w-5 text-secondary" />}
+              {event.icon ? (
+                iconMap[event.icon]
+              ) : (
+                <Clock className="h-5 w-5 text-secondary" />
+              )}
             </div>
 
             {/* Content */}
@@ -96,9 +98,7 @@ export const AuditTrail = ({
       <div className="space-y-2 border-t border-outline-variant pt-4">
         {systemId && (
           <div>
-            <p className="text-xs text-on-surface-variant">
-              System Node:
-            </p>
+            <p className="text-xs text-on-surface-variant">System Node:</p>
             <p className="font-mono text-sm font-semibold text-on-surface">
               {systemId}
             </p>
@@ -119,9 +119,7 @@ export const AuditTrail = ({
         {/* Compliance Tags */}
         {complianceTags.length > 0 && (
           <div>
-            <p className="text-xs text-on-surface-variant">
-              Compliance:
-            </p>
+            <p className="text-xs text-on-surface-variant">Compliance:</p>
             <div className="mt-1 flex gap-2">
               {complianceTags.map((tag) => (
                 <Badge

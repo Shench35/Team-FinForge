@@ -5,9 +5,9 @@ import hashlib
 import json
 from fastapi import APIRouter, Request, Header
 from typing import Optional
-from backend.config import Config
-from backend.DB.model import Transaction
-from backend.DB.main import Session, engine
+from backend_python_fastapi.config import Config
+from backend_python_fastapi.DB.model import Transaction
+from backend_python_fastapi.DB.main import Session, engine
 from sqlmodel import select
 from datetime import datetime
 

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.payment import payment_router
-from backend.DB.main import create_db
+from backend_python_fastapi.payment import payment_router
+from backend_python_fastapi.DB.main import create_db
 
 # Create FastAPI app instance
 app = FastAPI(
@@ -44,7 +44,7 @@ async def health_check():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
-        "backend.main:app",
+        "main:app",
         host="0.0.0.0",
         port=8000,
         reload=True

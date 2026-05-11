@@ -1,37 +1,84 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Button } from '../../ui/Button';
 import { Logo } from './Logo';
 
 export const PublicNavbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleMenu = () => setIsOpen(!isOpen);
+
+  const navLinks = [
+    { label: 'Features', path: '/#features' },
+    { label: 'Pricing', path: '/#pricing' },
+  ];
+
   return (
-    <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-outline-variant h-16">
+    <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-outline-variant h-20 md:h-24">
       <div className="max-w-container-max mx-auto px-6 h-full flex items-center justify-between">
         {/* Brand */}
-        <Link to="/" className="hover:opacity-90 transition-opacity">
-          <Logo size="md" />
+        <Link to="/" className="hover:opacity-90 transition-opacity" onClick={() => setIsOpen(false)}>
+          <Logo size="lg" />
         </Link>
 
         {/* Desktop Links */}
-        <div className="hidden md:flex items-center gap-8">
-          <Link to="/pricing" className="text-sm font-medium text-on-surface-variant hover:text-primary transition-colors">
-            Pricing
-          </Link>
-          <div className="flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-10">
+          {navLinks.map((link) => (
+            <a 
+              key={link.label} 
+              href={link.path} 
+              className="text-sm font-bold text-on-surface-variant hover:text-primary transition-colors"
+            >
+              {link.label}
+            </a>
+          ))}
+          <div className="flex items-center gap-4">
             <Link to="/login">
-              <Button variant="outlined" size="sm">Log In</Button>
+              <Button variant="outlined" size="sm" className="font-bold">Log In</Button>
             </Link>
             <Link to="/register">
-              <Button variant="primary" size="sm">Get Started</Button>
+              <Button variant="primary" size="sm" className="font-bold">Get Started</Button>
             </Link>
           </div>
         </div>
 
         {/* Mobile Menu Toggle */}
-        <button className="md:hidden p-2 text-primary hover:bg-surface rounded-md transition-colors">
-          <Menu className="w-6 h-6" />
+        <button 
+          onClick={toggleMenu}
+          className="md:hidden p-2 text-primary hover:bg-surface rounded-md transition-colors"
+          aria-label="Toggle menu"
+        >
+          {isOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
         </button>
       </div>
+
+      {/* Mobile Menu Overlay */}
+      {isOpen && (
+        <div className="md:hidden absolute top-full left-0 w-full bg-white border-b border-outline-variant animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="px-6 py-8 flex flex-col gap-6">
+            {navLinks.map((link) => (
+              <a 
+                key={link.label} 
+                href={link.path} 
+                onClick={() => setIsOpen(false)}
+                className="text-lg font-bold text-primary"
+              >
+                {link.label}
+              </a>
+            ))}
+            <hr className="border-outline-variant" />
+            <div className="flex flex-col gap-4">
+              <Link to="/login" onClick={() => setIsOpen(false)}>
+                <Button variant="outlined" size="lg" className="w-full font-bold">Log In</Button>
+              </Link>
+              <Link to="/register" onClick={() => setIsOpen(false)}>
+                <Button variant="primary" size="lg" className="w-full font-bold">Get Started</Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

@@ -3,14 +3,16 @@ import { Plus, Bell, ChevronDown } from 'lucide-react';
 import { Button } from '../../ui/Button';
 import { PlanBadge } from '../badges/PlanBadge';
 import { Logo } from './Logo';
-
-// Mock user - will be replaced by useAuth later
-const mockUser = {
-  name: 'Administrator',
-  plan: 'PRO' as const
-};
+import { useAuth } from '../../hooks/useAuth';
 
 export const Navbar = () => {
+  const { user } = useAuth();
+
+  // If no user is found, we can show a placeholder or handle it via ProtectedRoute
+  const initials = user?.fullName
+    ? user.fullName.split(' ').map(n => n[0]).join('').toUpperCase()
+    : '??';
+
   return (
     <header className="sticky top-0 z-40 w-full bg-white border-b border-outline-variant h-16">
       <div className="px-6 h-full flex items-center justify-between">
@@ -42,11 +44,11 @@ export const Navbar = () => {
 
           <div className="flex items-center gap-3 pl-2 border-l border-outline-variant ml-2 group cursor-pointer">
             <div className="flex flex-col items-end">
-              <span className="text-sm font-semibold text-primary leading-tight">{mockUser.name}</span>
-              <PlanBadge plan={mockUser.plan} size="sm" className="mt-0.5" />
+              <span className="text-sm font-semibold text-primary leading-tight">{user?.fullName || 'User'}</span>
+              {user?.plan && <PlanBadge plan={user.plan} size="sm" className="mt-0.5" />}
             </div>
             <div className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-bold text-xs uppercase">
-              AD
+              {initials}
             </div>
             <ChevronDown className="w-4 h-4 text-on-surface-variant" />
           </div>

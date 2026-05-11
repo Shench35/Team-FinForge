@@ -7,7 +7,7 @@ interface RequestOptions {
   isMultipart?: boolean;
 }
 
-const request = async ({ method, path, body, isMultipart = false }: RequestOptions) => {
+export const request = async <T>({ method, path, body, isMultipart = false }: RequestOptions): Promise<T> => {
   const token = localStorage.getItem('cv_token');
   const headers: Record<string, string> = {
     ...(token && { Authorization: `Bearer ${token}` }),
@@ -27,7 +27,7 @@ const request = async ({ method, path, body, isMultipart = false }: RequestOptio
   if (!response.ok) {
     throw new Error(data.error || 'Request failed');
   }
-  return data.data;
+  return data.data as T;
 };
 
 export const get = (path: string) => request({ method: 'GET', path });

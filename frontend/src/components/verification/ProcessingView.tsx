@@ -14,10 +14,7 @@ export const ProcessingView = ({
   isComplete = false,
   isFailed = false,
 }: ProcessingViewProps) => {
-  const safeStep = Math.min(
-    Math.max(currentStep, 1),
-    PROCESSING_STEPS.length,
-  );
+  const safeStep = Math.min(Math.max(currentStep, 1), PROCESSING_STEPS.length);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-surface p-4">

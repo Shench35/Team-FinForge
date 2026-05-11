@@ -112,7 +112,8 @@ app.post("/login", async (req, res) => {
 // --- Auth Middleware ---
 const authenticateToken = (req, res, next) => {
       const authHeader = req.headers["authorization"];
-      const token = authHeader && authHeader.split(" ")[1];
+      // Look for token in Header OR in Query String (?token=...)
+      const token = (authHeader && authHeader.split(" ")[1]) || req.query.token;
 
       if (!token) return res.status(401).json({ message: "Access token required" });
 
@@ -142,6 +143,26 @@ app.get("/profile", authenticateToken, async (req, res) => {
             res.json(user);
       } catch (error) {
             res.status(500).json({ message: "Error fetching profile" });
+      }
+});
+
+// Get All Users
+app.get("/users", authenticateToken, async (req, res) => {
+      try {
+            const users = await prisma.user.findMany({
+                  select: {
+                        id: true,
+                        email: true,
+                        firstName: true,
+                        lastName: true,
+                        role: true,
+                        createdAt: true,
+                  },
+            });
+            res.json(users);
+      } catch (error) {
+            console.error("Error fetching users:", error);
+            res.status(500).json({ message: "Error fetching user list" });
       }
 });
 

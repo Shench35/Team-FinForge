@@ -1,10 +1,10 @@
-import { request } from '../utils/api';
+import { request } from "../utils/api";
 
 export interface User {
   id: string;
   email: string;
   fullName: string;
-  plan: 'PRO' | 'PRO_MAX' | 'ENTERPRISE';
+  plan: "PRO" | "PRO_MAX" | "ENTERPRISE";
   verifiedAt?: string;
 }
 
@@ -26,42 +26,42 @@ interface RegisterData {
 }
 
 export const authApi = {
-  login: (credentials: LoginCredentials) => 
+  login: (credentials: LoginCredentials) =>
     request<AuthResponse>({
-      method: 'POST',
-      path: '/login',
+      method: "POST",
+      path: "/login",
       body: credentials,
     }),
 
   register: (data: RegisterData) => {
     // Split fullName into firstName and lastName for backend compatibility
-    const nameParts = data.fullName.trim().split(' ');
-    const firstName = nameParts[0] || '';
-    const lastName = nameParts.slice(1).join(' ') || '';
+    const nameParts = data.fullName.trim().split(" ");
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.slice(1).join(" ") || "";
 
     return request<AuthResponse>({
-      method: 'POST',
-      path: '/register',
+      method: "POST",
+      path: "/register",
       body: {
         email: data.email,
         password: data.password,
         firstName,
         lastName,
-        organisation: data.organisation
+        organisation: data.organisation,
       },
     });
   },
 
-  getMe: () => 
+  getMe: () =>
     request<User>({
-      method: 'GET',
-      path: '/users/me', // Adjusted based on common patterns, update if different
+      method: "GET",
+      path: "/users/me", // Adjusted based on common patterns, update if different
     }),
 
-  updatePlan: (plan: string) => 
+  updatePlan: (plan: string) =>
     request<User>({
-      method: 'PUT',
-      path: '/users/update-plan',
+      method: "PUT",
+      path: "/users/update-plan",
       body: { plan },
     }),
 };

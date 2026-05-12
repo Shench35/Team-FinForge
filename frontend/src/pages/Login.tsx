@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { AuthLayout } from '../components/layout/AuthLayout';
-import { Input } from '../ui/Input';
-import { Button } from '../ui/Button';
-import { useAuth } from '../hooks/useAuth';
-import { authApi } from '../api/auth';
-import { ShieldCheck } from 'lucide-react';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthLayout } from "../components/layout/AuthLayout";
+import { Input } from "../ui/Input";
+import { Button } from "../ui/Button";
+import { useAuth } from "../hooks/useAuth";
+import { authApi } from "../api/auth";
+import { ShieldCheck } from "lucide-react";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -24,9 +24,10 @@ const Login = () => {
     try {
       const response = await authApi.login({ email, password });
       login(response.token, response.user);
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Invalid email or password';
+      const message =
+        err instanceof Error ? err.message : "Invalid email or password";
       setError(message);
     } finally {
       setLoading(false);
@@ -35,7 +36,7 @@ const Login = () => {
 
   const bottomLink = (
     <p className="text-center text-sm text-on-surface-variant font-medium">
-      Don't have an account?{' '}
+      Don't have an account?{" "}
       <Link to="/register" className="font-bold text-[#0F172A] hover:underline">
         Sign up
       </Link>
@@ -43,8 +44,8 @@ const Login = () => {
   );
 
   return (
-    <AuthLayout 
-      title="Login" 
+    <AuthLayout
+      title="Login"
       subtitle="AUTHORIZED ACCESS ONLY"
       bottomLink={bottomLink}
     >
@@ -58,7 +59,7 @@ const Login = () => {
           required
           className="bg-[#F8FAFC] border-[#E2E8F0]"
         />
-        
+
         <div className="space-y-1">
           <Input
             label="PASSWORD"
@@ -70,7 +71,11 @@ const Login = () => {
             className="bg-[#F8FAFC] border-[#E2E8F0]"
           />
           <div className="flex justify-start">
-            <Link to="/forgot-password" title="Forgot Password" className="text-xs font-bold text-secondary hover:underline">
+            <Link
+              to="/forgot-password"
+              title="Forgot Password"
+              className="text-xs font-bold text-secondary hover:underline"
+            >
               Forgot password?
             </Link>
           </div>
@@ -82,10 +87,10 @@ const Login = () => {
           </p>
         )}
 
-        <Button 
-          type="submit" 
-          variant="primary" 
-          className="w-full h-12 text-sm font-bold tracking-widest uppercase bg-[#006C4E] hover:bg-[#005a41]" 
+        <Button
+          type="submit"
+          variant="primary"
+          className="w-full h-12 text-sm font-bold tracking-widest uppercase bg-[#006C4E] hover:bg-[#005a41]"
           loading={loading}
         >
           LOG IN

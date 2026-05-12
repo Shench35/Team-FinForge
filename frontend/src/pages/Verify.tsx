@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { FileUpload } from "../components/verification/FileUpload";
 import { OrderSummary } from "../components/verification/OrderSummary";
@@ -9,51 +9,11 @@ import { PageLayout } from "../components/layout/PageLayout";
 import { Alert } from "../ui/Alert";
 import { Card } from "../ui/Card";
 import { useAuth } from "../hooks/useAuth";
-import { get, post } from "../utils/api";
+import { useVerification } from "../hooks/useVerification";
+import { usePollStatus } from "../hooks/usePollStatus";
 
 type PlanType = "PRO" | "PRO_MAX" | "ENTERPRISE";
 type FlowStage = "upload" | "payment" | "processing";
-type VerificationStatus =
-  | "PENDING_PAYMENT"
-  | "PAYMENT_CONFIRMED"
-  | "PROCESSING"
-  | "COMPLETED"
-  | "FAILED";
-
-interface UploadResponse {
-  verificationId?: string;
-  id?: string;
-}
-
-interface PaymentResponse {
-  paymentUrl?: string;
-  url?: string;
-}
-
-interface StatusResponse {
-  status?: VerificationStatus;
-  currentStep?: number;
-  step?: number;
-  error?: string;
-  message?: string;
-}
-
-const parseVerificationId = (value: UploadResponse): string | null => {
-  return value.verificationId ?? value.id ?? null;
-};
-
-const parsePaymentUrl = (value: PaymentResponse): string | null => {
-  return value.paymentUrl ?? value.url ?? null;
-};
-
-const clampStep = (step: number): number => Math.max(1, Math.min(6, step));
-
-const toStatusResponse = (value: unknown): StatusResponse => {
-  if (typeof value === "object" && value !== null) {
-    return value as StatusResponse;
-  }
-  return {};
-};
 
 export default function Verify() {
   const navigate = useNavigate();
@@ -72,99 +32,43 @@ export default function Verify() {
   );
   const [paymentUrl, setPaymentUrl] = useState<string>("");
   const [flowStage, setFlowStage] = useState<FlowStage>(initialFlowStage);
-  const [currentStep, setCurrentStep] = useState(1);
-  const [isFailed, setIsFailed] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [localError, setLocalError] = useState<string | null>(null);
 
   const planType: PlanType = useMemo(() => {
     if (!user?.plan) return "PRO";
     return user.plan;
   }, [user?.plan]);
 
-  useEffect(() => {
-    if (flowStage !== "processing" || !verificationId || isFailed) return;
+  const { isSubmitting, error: verificationError, startVerification, resetError } =
+    useVerification();
 
-    let cancelled = false;
-
-    const pollStatus = async () => {
-      try {
-        const response = toStatusResponse(
-          await get(`/api/verification/${verificationId}`),
-        );
-        if (cancelled) return;
-
-        const status = response.status;
-        const apiStep = response.currentStep ?? response.step;
-
-        if (typeof apiStep === "number") {
-          setCurrentStep(clampStep(apiStep));
-        } else {
-          setCurrentStep((prev) => clampStep(prev + 1));
-        }
-
-        if (status === "COMPLETED") {
-          navigate(`/result/${verificationId}`);
-          return;
-        }
-
-        if (status === "FAILED") {
-          setIsFailed(true);
-          setError(
-            response.error ??
-              response.message ??
-              "Verification failed. Please retry.",
-          );
-        }
-      } catch {
-        setCurrentStep((prev) => {
-          const next = clampStep(prev + 1);
-          if (next >= 6) {
-            navigate(`/result/${verificationId}`);
-          }
-          return next;
-        });
+  const { currentStep, isFailed, error: pollError } = usePollStatus({
+    verificationId,
+    enabled: flowStage === "processing" && Boolean(verificationId),
+    onComplete: () => {
+      if (verificationId) {
+        navigate(`/result/${verificationId}`);
       }
-    };
-
-    pollStatus();
-    const interval = window.setInterval(pollStatus, 3000);
-
-    return () => {
-      cancelled = true;
-      window.clearInterval(interval);
-    };
-  }, [flowStage, verificationId, isFailed, navigate]);
+    },
+    onFailure: (message) => {
+      setLocalError(message);
+    },
+  });
 
   const handleStartPayment = async () => {
     if (selectedFiles.length === 0) {
-      setError(
+      setLocalError(
         "Please upload at least one document before proceeding to payment.",
       );
       return;
     }
 
-    setError(null);
-    setIsSubmitting(true);
+    resetError();
+    setLocalError(null);
 
     try {
-      const formData = new FormData();
-      selectedFiles.forEach((file) => formData.append("files", file));
-
-      const uploadResponse = (await post(
-        "/api/verification/upload",
-        formData,
-        true,
-      )) as UploadResponse;
-      const resolvedVerificationId =
-        parseVerificationId(uploadResponse) ?? `local-${Date.now()}`;
-
-      const paymentResponse = (await post("/api/verification/pay", {
-        verificationId: resolvedVerificationId,
-      })) as PaymentResponse;
-
-      const resolvedPaymentUrl =
-        parsePaymentUrl(paymentResponse) ?? "https://checkout.squadco.com";
+      const { verificationId: resolvedVerificationId, paymentUrl: resolvedPaymentUrl } =
+        await startVerification(selectedFiles);
 
       setVerificationId(resolvedVerificationId);
       setPaymentUrl(resolvedPaymentUrl);
@@ -177,17 +81,13 @@ export default function Verify() {
         submitError instanceof Error
           ? submitError.message
           : "Failed to initialize verification.";
-      setError(message);
-    } finally {
-      setIsSubmitting(false);
+      setLocalError(message);
     }
   };
 
   const handlePaymentInitiated = () => {
     setFlowStage("processing");
-    setCurrentStep(1);
-    setIsFailed(false);
-    setError(null);
+    setLocalError(null);
   };
 
   if (flowStage === "payment" && verificationId) {
@@ -226,8 +126,12 @@ export default function Verify() {
 
         <StepIndicator currentStep={1} isProcessing={false} />
 
-        {error && (
-          <Alert type="error" message={error} onClose={() => setError(null)} />
+        {(localError || verificationError || pollError) && (
+          <Alert
+            type="error"
+            message={localError ?? verificationError ?? pollError ?? "Something went wrong."}
+            onClose={() => setLocalError(null)}
+          />
         )}
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

@@ -47,7 +47,7 @@ export const Sidebar = () => {
   };
 
   return (
-    <aside className="fixed left-0 top-0 bottom-0 w-64 bg-[#F8FAFC] border-r border-outline-variant flex flex-col hidden md:flex z-50">
+    <aside className="fixed left-0 top-0 bottom-0 z-50 hidden w-64 border-r border-outline-variant bg-[#F8FAFC] md:flex md:flex-col">
       {/* Brand Header */}
       <div className="py-10 px-8 flex flex-col gap-1">
         <Link to="/" className="hover:opacity-90 transition-opacity">

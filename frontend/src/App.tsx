@@ -7,6 +7,8 @@ import { PageLayout } from './components/layout/PageLayout';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Landing from './pages/Landing';
+import PlanSelect from './pages/PlanSelect';
+import Dashboard from './pages/Dashboard';
 
 function App() {
   return (
@@ -18,15 +20,14 @@ function App() {
           <Route path="/pricing" element={<div className="p-20 text-center text-4xl font-bold">Pricing Page (Awaiting UI)</div>} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/plan-select" element={<PlanSelect />} />
 
           {/* Protected Dashboard Routes */}
           <Route
             path="/dashboard"
             element={
               <ProtectedRoute>
-                <PageLayout>
-                  <div className="text-2xl font-bold">Dashboard (Awaiting UI)</div>
-                </PageLayout>
+                <Dashboard />
               </ProtectedRoute>
             }
           />

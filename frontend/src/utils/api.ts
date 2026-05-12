@@ -1,4 +1,4 @@
-const BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const BASE = 'https://4184-102-89-76-190.ngrok-free.app';
 
 interface RequestOptions {
   method: string;
@@ -8,7 +8,7 @@ interface RequestOptions {
 }
 
 export const request = async <T>({ method, path, body, isMultipart = false }: RequestOptions): Promise<T> => {
-  const token = localStorage.getItem('cv_token');
+  const token = localStorage.getItem('finforge_token');
   const headers: Record<string, string> = {
     ...(token && { Authorization: `Bearer ${token}` }),
   };
@@ -25,9 +25,9 @@ export const request = async <T>({ method, path, body, isMultipart = false }: Re
 
   const data = await response.json();
   if (!response.ok) {
-    throw new Error(data.error || 'Request failed');
+    throw new Error(data.message || 'Request failed');
   }
-  return data.data as T;
+  return data as T;
 };
 
 export const get = (path: string) => request({ method: 'GET', path });

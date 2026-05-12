@@ -1,25 +1,26 @@
-import { Badge } from "../../ui/Badge";
-import { VERDICT_CONFIG } from "../../utils/constants";
+import { VERDICT_CONFIG } from '../../utils/constants';
+
+type VerdictType = keyof typeof VERDICT_CONFIG;
 
 interface VerdictBadgeProps {
-  verdict: "LIKELY_AUTHENTIC" | "SUSPICIOUS" | "HIGH_RISK";
-  size?: "sm" | "md";
+  verdict: VerdictType;
+  className?: string;
 }
 
-export const VerdictBadge = ({ verdict, size = "md" }: VerdictBadgeProps) => {
+export const VerdictBadge = ({ verdict, className = '' }: VerdictBadgeProps) => {
   const config = VERDICT_CONFIG[verdict];
-
-  const colorMap = {
-    LIKELY_AUTHENTIC: "bg-green-100 text-green-700",
-    SUSPICIOUS: "bg-amber-100 text-amber-700",
-    HIGH_RISK: "bg-red-100 text-red-700",
-  };
+  
+  if (!config) return null;
 
   return (
-    <Badge
-      label={config.label}
-      size={size}
-      className={`${colorMap[verdict]} font-semibold`}
-    />
+    <span 
+      className={`px-3 py-1 rounded-sm text-[10px] font-bold uppercase tracking-widest border border-current ${className}`}
+      style={{ 
+        color: config.color,
+        backgroundColor: `${config.color}10` // 10% opacity
+      }}
+    >
+      {config.label}
+    </span>
   );
 };

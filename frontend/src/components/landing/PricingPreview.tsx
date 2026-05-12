@@ -1,41 +1,32 @@
 import { Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '../../ui/Button';
+import { PLAN_PRICES, PLAN_DOC_FEATURES, PLAN_LABELS } from '../../utils/constants';
 
 const plans = [
   {
-    name: 'PRO',
-    price: '$49',
-    period: '/mo',
-    features: [
-      '10 Verifications / mo',
-      'Basic AI Metadata Extraction',
-      'Email Support',
-    ],
+    id: 'PRO',
+    name: PLAN_LABELS.PRO,
+    price: PLAN_PRICES.PRO,
+    period: '/session',
+    features: PLAN_DOC_FEATURES.PRO,
     buttonVariant: 'outlined' as const,
   },
   {
-    name: 'PRO MAX',
-    price: '$199',
-    period: '/mo',
-    features: [
-      '50 Verifications / mo',
-      'Advanced Fraud Analysis',
-      'Priority Processing',
-      'PDF Verification Reports',
-    ],
+    id: 'PRO_MAX',
+    name: PLAN_LABELS.PRO_MAX,
+    price: PLAN_PRICES.PRO_MAX,
+    period: '/session',
+    features: PLAN_DOC_FEATURES.PRO_MAX,
     isPopular: true,
     buttonVariant: 'primary' as const,
   },
   {
-    name: 'ENTERPRISE',
-    price: 'Custom',
-    period: '',
-    features: [
-      'Unlimited Verifications',
-      'Custom API Integration',
-      'Dedicated Account Manager',
-    ],
+    id: 'ENTERPRISE',
+    name: PLAN_LABELS.ENTERPRISE,
+    price: PLAN_PRICES.ENTERPRISE,
+    period: '/session',
+    features: PLAN_DOC_FEATURES.ENTERPRISE,
     buttonVariant: 'outlined' as const,
   },
 ];
@@ -60,7 +51,7 @@ export const PricingPreview = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
           {plans.map((plan) => (
             <div 
-              key={plan.name}
+              key={plan.id}
               className={`
                 relative flex flex-col p-8 rounded-2xl border transition-all duration-300
                 ${plan.isPopular 
@@ -101,7 +92,7 @@ export const PricingPreview = () => {
               <Link to="/register">
                 <Button 
                   variant={plan.buttonVariant} 
-                  className={`w-full h-12 font-bold ${plan.isPopular ? 'hover:shadow-lg' : 'text-white border-white/20 hover:bg-white/10 hover:border-white'}`}
+                  className={`w-full h-12 font-bold ${plan.isPopular ? 'bg-[#006C4E] text-white border-none hover:bg-[#005a41] hover:shadow-lg' : 'text-white border-white/20 hover:bg-white/10 hover:border-white'}`}
                 >
                   Register
                 </Button>

@@ -17,27 +17,39 @@ export const authApi = {
   login: (credentials: any) => 
     request<AuthResponse>({
       method: 'POST',
-      path: '/auth/login',
+      path: '/login',
       body: credentials,
     }),
 
-  register: (data: any) => 
-    request<AuthResponse>({
+  register: (data: any) => {
+    // Split fullName into firstName and lastName for backend compatibility
+    const nameParts = data.fullName.trim().split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
+    return request<AuthResponse>({
       method: 'POST',
-      path: '/auth/register',
-      body: data,
-    }),
+      path: '/register',
+      body: {
+        email: data.email,
+        password: data.password,
+        firstName,
+        lastName,
+        organisation: data.organisation
+      },
+    });
+  },
 
   getMe: () => 
     request<User>({
       method: 'GET',
-      path: '/auth/me',
+      path: '/users/me', // Adjusted based on common patterns, update if different
     }),
 
   updatePlan: (plan: string) => 
     request<User>({
       method: 'PUT',
-      path: '/auth/update-plan',
+      path: '/users/update-plan',
       body: { plan },
     }),
 };

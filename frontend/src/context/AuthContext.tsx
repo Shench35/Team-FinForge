@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const initAuth = async () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('finforge_token');
       if (!token) {
         setLoading(false);
         return;
@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(userData);
       } catch (error) {
         console.error('Auth initialization failed:', error);
-        localStorage.removeItem('token');
+        localStorage.removeItem('finforge_token');
       } finally {
         setLoading(false);
       }
@@ -38,12 +38,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = (token: string, userData: User) => {
-    localStorage.setItem('token', token);
+    localStorage.setItem('finforge_token', token);
     setUser(userData);
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('finforge_token');
     setUser(null);
   };
 

@@ -8,7 +8,7 @@ interface MobileBottomNavProps {
   onTabChange?: (tab: NavTab) => void;
 }
 
-const MobileBottomNav = ({
+export const MobileBottomNav = ({
   activeTab: initialTab = "home",
   onTabChange,
 }: MobileBottomNavProps) => {
@@ -51,4 +51,3 @@ const MobileBottomNav = ({
   );
 };
 
-export default MobileBottomNav;

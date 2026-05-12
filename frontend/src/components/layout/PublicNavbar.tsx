@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { Button } from '../../ui/Button';
 import { Logo } from './Logo';
 
 export const PublicNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -13,6 +14,14 @@ export const PublicNavbar = () => {
     { label: 'Features', path: '/#features' },
     { label: 'Pricing', path: '/#pricing' },
   ];
+
+  // Helper to check if a link is active
+  const isActive = (path: string) => {
+    if (path.startsWith('/#')) {
+      return location.hash === path.substring(1);
+    }
+    return location.pathname === path;
+  };
 
   return (
     <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-outline-variant h-20 md:h-24">
@@ -28,12 +37,20 @@ export const PublicNavbar = () => {
             <a 
               key={link.label} 
               href={link.path} 
-              className="text-sm font-bold text-on-surface-variant hover:text-primary transition-colors"
+              className={`text-sm font-bold transition-all duration-300 relative py-2
+                ${isActive(link.path) 
+                  ? 'text-primary' 
+                  : 'text-on-surface-variant hover:text-primary'
+                }
+              `}
             >
               {link.label}
+              {isActive(link.path) && (
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-secondary animate-in fade-in zoom-in duration-300" />
+              )}
             </a>
           ))}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 pl-4 border-l border-outline-variant">
             <Link to="/login">
               <Button variant="outlined" size="sm" className="font-bold">Log In</Button>
             </Link>

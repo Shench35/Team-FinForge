@@ -1,4 +1,4 @@
-export const PLAN_LIMITS = { PRO: 3, PRO_MAX: 5, ENTERPRISE: 7 } as const;
+export const PLAN_LIMITS = { PRO: 10, PRO_MAX: 50, ENTERPRISE: 100000000 } as const;
 
 export const PLAN_LABELS = { PRO: 'Pro', PRO_MAX: 'Pro Max', ENTERPRISE: 'Enterprise' } as const;
 
@@ -8,24 +8,24 @@ export const PLAN_COLORS = { PRO: 'blue', PRO_MAX: 'purple', ENTERPRISE: 'green'
 
 export const PLAN_DOC_FEATURES = {
   PRO: [
-    '3 documents per session',
-    'Single upload interface',
+    '10 Verifications / mo',
+    'Standard Email Support',
+    'Digital Certificates',
     'Standard processing',
-    'Basic PDF report',
   ],
   PRO_MAX: [
-    '5 documents per session',
-    'Multi-file drag-and-drop',
-    'Real-time API access',
-    'Institutional branding',
-    'Detailed analytics report',
+    '50 Verifications / mo',
+    'Priority 24/7 Support',
+    'Bulk Upload Feature',
+    'API Access (Alpha)',
+    'Advanced Fraud Analysis',
   ],
   ENTERPRISE: [
-    '7 documents per session',
+    'Unlimited Verifications',
+    'Dedicated Account Manager',
+    'Full API & Webhooks',
+    'Custom Branding',
     'Priority queue processing',
-    'Bulk verification tools',
-    'Dedicated account manager',
-    'Full forensic audit report',
   ],
 } as const;
 

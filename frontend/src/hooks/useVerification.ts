@@ -1,10 +1,10 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState } from "react";
 import {
   initiateVerificationPayment,
   parsePaymentUrl,
   parseVerificationId,
   uploadVerification,
-} from '../api/verification';
+} from "../api/verification";
 
 interface UseVerificationResult {
   isSubmitting: boolean;
@@ -24,33 +24,37 @@ export const useVerification = (): UseVerificationResult => {
     setError(null);
   }, []);
 
-  const startVerification = useCallback(
-    async (files: File[]) => {
-      if (files.length === 0) {
-        throw new Error('Please upload at least one document before proceeding to payment.');
-      }
+  const startVerification = useCallback(async (files: File[]) => {
+    if (files.length === 0) {
+      throw new Error(
+        "Please upload at least one document before proceeding to payment.",
+      );
+    }
 
-      setIsSubmitting(true);
-      setError(null);
+    setIsSubmitting(true);
+    setError(null);
 
-      try {
-        const uploadResponse = await uploadVerification(files);
-        const verificationId = parseVerificationId(uploadResponse) ?? `local-${Date.now()}`;
+    try {
+      const uploadResponse = await uploadVerification(files);
+      const verificationId =
+        parseVerificationId(uploadResponse) ?? `local-${Date.now()}`;
 
-        const paymentResponse = await initiateVerificationPayment(verificationId);
-        const paymentUrl = parsePaymentUrl(paymentResponse) ?? 'https://checkout.squadco.com';
+      const paymentResponse = await initiateVerificationPayment(verificationId);
+      const paymentUrl =
+        parsePaymentUrl(paymentResponse) ?? "https://checkout.squadco.com";
 
-        return { verificationId, paymentUrl };
-      } catch (requestError: unknown) {
-        const message = requestError instanceof Error ? requestError.message : 'Failed to initialize verification.';
-        setError(message);
-        throw requestError instanceof Error ? requestError : new Error(message);
-      } finally {
-        setIsSubmitting(false);
-      }
-    },
-    [],
-  );
+      return { verificationId, paymentUrl };
+    } catch (requestError: unknown) {
+      const message =
+        requestError instanceof Error
+          ? requestError.message
+          : "Failed to initialize verification.";
+      setError(message);
+      throw requestError instanceof Error ? requestError : new Error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, []);
 
   return { isSubmitting, error, startVerification, resetError };
 };

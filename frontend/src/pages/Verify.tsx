@@ -39,10 +39,18 @@ export default function Verify() {
     return user.plan;
   }, [user?.plan]);
 
-  const { isSubmitting, error: verificationError, startVerification, resetError } =
-    useVerification();
+  const {
+    isSubmitting,
+    error: verificationError,
+    startVerification,
+    resetError,
+  } = useVerification();
 
-  const { currentStep, isFailed, error: pollError } = usePollStatus({
+  const {
+    currentStep,
+    isFailed,
+    error: pollError,
+  } = usePollStatus({
     verificationId,
     enabled: flowStage === "processing" && Boolean(verificationId),
     onComplete: () => {
@@ -67,8 +75,10 @@ export default function Verify() {
     setLocalError(null);
 
     try {
-      const { verificationId: resolvedVerificationId, paymentUrl: resolvedPaymentUrl } =
-        await startVerification(selectedFiles);
+      const {
+        verificationId: resolvedVerificationId,
+        paymentUrl: resolvedPaymentUrl,
+      } = await startVerification(selectedFiles);
 
       setVerificationId(resolvedVerificationId);
       setPaymentUrl(resolvedPaymentUrl);
@@ -129,7 +139,12 @@ export default function Verify() {
         {(localError || verificationError || pollError) && (
           <Alert
             type="error"
-            message={localError ?? verificationError ?? pollError ?? "Something went wrong."}
+            message={
+              localError ??
+              verificationError ??
+              pollError ??
+              "Something went wrong."
+            }
             onClose={() => setLocalError(null)}
           />
         )}

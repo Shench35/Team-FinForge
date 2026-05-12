@@ -1,5 +1,8 @@
-import { useEffect, useState } from 'react';
-import { fetchVerificationStatus, type VerificationStatus } from '../api/verification';
+import { useEffect, useState } from "react";
+import {
+  fetchVerificationStatus,
+  type VerificationStatus,
+} from "../api/verification";
 
 interface UsePollStatusOptions {
   verificationId: string | null;
@@ -43,20 +46,23 @@ export const usePollStatus = ({
         setStatus(response.status ?? null);
 
         const apiStep = response.currentStep ?? response.step;
-        if (typeof apiStep === 'number') {
+        if (typeof apiStep === "number") {
           setCurrentStep(clampStep(apiStep));
         } else {
           setCurrentStep((prev) => clampStep(prev + 1));
         }
 
-        if (response.status === 'COMPLETED') {
+        if (response.status === "COMPLETED") {
           onComplete?.();
           cancelled = true;
           return;
         }
 
-        if (response.status === 'FAILED') {
-          const message = response.error ?? response.message ?? 'Verification failed. Please retry.';
+        if (response.status === "FAILED") {
+          const message =
+            response.error ??
+            response.message ??
+            "Verification failed. Please retry.";
           setIsFailed(true);
           setError(message);
           onFailure?.(message);

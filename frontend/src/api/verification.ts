@@ -1,12 +1,12 @@
-import { request } from '../utils/api';
+import { request } from "../utils/api";
 
-export type PlanType = 'PRO' | 'PRO_MAX' | 'ENTERPRISE';
+export type PlanType = "PRO" | "PRO_MAX" | "ENTERPRISE";
 export type VerificationStatus =
-  | 'PENDING_PAYMENT'
-  | 'PAYMENT_CONFIRMED'
-  | 'PROCESSING'
-  | 'COMPLETED'
-  | 'FAILED';
+  | "PENDING_PAYMENT"
+  | "PAYMENT_CONFIRMED"
+  | "PROCESSING"
+  | "COMPLETED"
+  | "FAILED";
 
 export interface UploadVerificationResponse {
   verificationId?: string;
@@ -27,27 +27,31 @@ export interface VerificationStatusResponse {
 }
 
 const extractResponse = <T>(value: unknown): T => {
-  if (typeof value === 'object' && value !== null) {
+  if (typeof value === "object" && value !== null) {
     return value as T;
   }
   return {} as T;
 };
 
-export const parseVerificationId = (value: UploadVerificationResponse): string | null => {
+export const parseVerificationId = (
+  value: UploadVerificationResponse,
+): string | null => {
   return value.verificationId ?? value.id ?? null;
 };
 
-export const parsePaymentUrl = (value: PaymentVerificationResponse): string | null => {
+export const parsePaymentUrl = (
+  value: PaymentVerificationResponse,
+): string | null => {
   return value.paymentUrl ?? value.url ?? null;
 };
 
 export const uploadVerification = async (files: File[]) => {
   const formData = new FormData();
-  files.forEach((file) => formData.append('files', file));
+  files.forEach((file) => formData.append("files", file));
 
   const response = await request<UploadVerificationResponse>({
-    method: 'POST',
-    path: '/api/verification/upload',
+    method: "POST",
+    path: "/api/verification/upload",
     body: formData,
     isMultipart: true,
   });
@@ -57,8 +61,8 @@ export const uploadVerification = async (files: File[]) => {
 
 export const initiateVerificationPayment = async (verificationId: string) => {
   const response = await request<PaymentVerificationResponse>({
-    method: 'POST',
-    path: '/api/verification/pay',
+    method: "POST",
+    path: "/api/verification/pay",
     body: { verificationId },
   });
 
@@ -67,7 +71,7 @@ export const initiateVerificationPayment = async (verificationId: string) => {
 
 export const fetchVerificationStatus = async (verificationId: string) => {
   const response = await request<VerificationStatusResponse>({
-    method: 'GET',
+    method: "GET",
     path: `/api/verification/${verificationId}`,
   });
 

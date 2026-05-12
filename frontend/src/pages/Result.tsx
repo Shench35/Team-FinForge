@@ -1,30 +1,32 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { AIResultSummary } from '../components/results/AIResultSummary';
-import { DimensionBreakdown } from '../components/results/DimensionBreakdown';
-import { AnomalyList } from '../components/results/AnomalyList';
-import { AuditTrail } from '../components/results/AuditTrail';
-import { ResultActions } from '../components/results/ResultActions';
-import { PageLayout } from '../components/layout/PageLayout';
-import { Alert } from '../ui/Alert';
-import { Card } from '../ui/Card';
-import { Spinner } from '../ui/Spinner';
+import { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { AIResultSummary } from "../components/results/AIResultSummary";
+import { DimensionBreakdown } from "../components/results/DimensionBreakdown";
+import { AnomalyList } from "../components/results/AnomalyList";
+import { AuditTrail } from "../components/results/AuditTrail";
+import { ResultActions } from "../components/results/ResultActions";
+import { PageLayout } from "../components/layout/PageLayout";
+import { Alert } from "../ui/Alert";
+import { Card } from "../ui/Card";
+import { Spinner } from "../ui/Spinner";
 import {
   fetchVerificationReport,
   normalizeVerificationReport,
   type VerificationReport,
-} from '../api/report';
+} from "../api/report";
 
 export default function Result() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const verificationId = id ?? 'unknown';
+  const verificationId = id ?? "unknown";
   const statePayload = (location.state as { report?: unknown } | null)?.report;
 
   const [report, setReport] = useState<VerificationReport | null>(
-    statePayload ? normalizeVerificationReport(statePayload, verificationId) : null,
+    statePayload
+      ? normalizeVerificationReport(statePayload, verificationId)
+      : null,
   );
   const [loading, setLoading] = useState(!statePayload);
   const [error, setError] = useState<string | null>(null);
@@ -51,7 +53,7 @@ export default function Result() {
         const message =
           fetchError instanceof Error
             ? fetchError.message
-            : 'Failed to load verification report.';
+            : "Failed to load verification report.";
         setError(message);
         setReport(normalizeVerificationReport({}, verificationId));
       } finally {
@@ -71,12 +73,12 @@ export default function Result() {
   const actions = useMemo(() => {
     return {
       onDownload: () => window.print(),
-      onVerifyAnother: () => navigate('/verify'),
+      onVerifyAnother: () => navigate("/verify"),
       onExport: () => window.print(),
-      onManualOverride: () => navigate('/dashboard'),
-      onRequestReVerification: () => navigate('/verify'),
+      onManualOverride: () => navigate("/dashboard"),
+      onRequestReVerification: () => navigate("/verify"),
       onGenerateFraudReport: () => window.print(),
-      onFlagForReview: () => navigate('/dashboard'),
+      onFlagForReview: () => navigate("/dashboard"),
     };
   }, [navigate]);
 

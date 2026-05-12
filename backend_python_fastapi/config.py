@@ -9,6 +9,11 @@ class Settings(BaseSettings):
     SQUAD_BASE_URL:str = "https://sandbox-api-d.squadco.com"
     DATABASE_URL:str
     GEMINI_API_KEY:str
+    JWT_SECRET:str
+    JWT_ALGORITHM:str
+    ACCESS_TOKEN_EXPIRE_MINUTES:int
+    REFRESH_TOKEN_DAYS:int
+    
 
 
     model_config = SettingsConfigDict(

@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel, create_engine, Session
-from backend_python_fastapi.config import Config
+from config import Config
 
 engine = create_engine(Config.DATABASE_URL,
                        echo=True,

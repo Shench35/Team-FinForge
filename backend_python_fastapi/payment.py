@@ -3,16 +3,17 @@ import uuid
 import hmac
 import hashlib
 import json
-from fastapi import APIRouter, Request, Header
+from fastapi import APIRouter, Request, Header, Depends
 from typing import Optional
-from backend_python_fastapi.config import Config
-from backend_python_fastapi.DB.model import Transaction
-from backend_python_fastapi.DB.main import Session, engine
+from config import Config
+from DB.model import Transaction
+from DB.main import Session, engine
 from sqlmodel import select
 from datetime import datetime
+from auth_dependencies import AccessTokenBearer
 
 payment_router = APIRouter()
-
+access_token_bearer = AccessTokenBearer()
 processed_transactions = set()
 
 
@@ -154,7 +155,7 @@ async def squad_webhook(
         computed = hmac.new(
             Config.SQUAD_SECRET_KEY.encode("utf-8"),
             body_bytes,
-            hashlib.sha51
+            hashlib.sha512
             ).hexdigest()
 
     print(f"Computed: {computed}")
@@ -209,18 +210,18 @@ async def squad_webhook(
 # CALLBACK (user lands here after payment)
 
 @payment_router.get("/pay/callback")
-async def payment_callback(transaction_reference: str = None):
-    if not transaction_reference:
+async def payment_callback(reference: str = None):
+    if not reference:
         return {"message": "No transaction reference received"}
 
-    print(f"User returned after payment. Ref: {transaction_reference}")
+    print(f"User returned after payment. Ref: {reference}")
 
     # Verify with Squad
     headers = {"Authorization": f"Bearer {Config.SQUAD_SECRET_KEY}"}
 
     async with httpx.AsyncClient() as client:
         res = await client.get(
-            f"{Config.SQUAD_BASE_URL}/transaction/verify/{transaction_reference}",
+            f"{Config.SQUAD_BASE_URL}/transaction/verify/{reference}",
             headers=headers
         )
 
@@ -231,7 +232,7 @@ async def payment_callback(transaction_reference: str = None):
     if status == "Success":
         with Session(engine) as session:
             statement = select(Transaction).where(
-                Transaction.transaction_ref == transaction_reference
+                Transaction.transaction_ref == reference
             )
             transaction = session.exec(statement).first()
             if transaction and transaction.status != "success":
@@ -239,86 +240,10 @@ async def payment_callback(transaction_reference: str = None):
                 transaction.paid_at = datetime.utcnow()
                 session.add(transaction)
                 session.commit()
-                print(f"DB updated via callback: {transaction_reference}")
+                print(f"DB updated via callback: {reference}")
 
     return {
         "message": "Payment completed",
-        "transaction_ref": transaction_reference,
+        "transaction_ref": reference,
         "status": status
     }
-
-
-@payment_router.post("/test/charge-card")
-async def test_charge_card(transaction_ref: str):
-    """Test endpoint - Direct card charge bypassing modal"""
-    headers = {
-        "Authorization": f"Bearer {Config.SQUAD_SECRET_KEY}",
-        "Content-Type": "application/json"
-    }
-    body = {
-        "transaction_reference": transaction_ref,
-        "amount": 100000,  # ₦1000 in kobo
-        "pass_charge": True,
-        "currency": "NGN",
-        "webhook_url": "https://junkman-thrash-omission.ngrok-free.dev/payment/webhook",
-        "card": {
-            "number": "5555555555554444",
-            "cvv": "121",
-            "expiry_month": "12",
-            "expiry_year": "50"
-        },
-        "payment_method": "card",
-        "customer": {
-            "name": "Test User",
-            "email": "akinpelushuaib0@gmail.com"
-        },
-        "redirect_url": "https://junkman-thrash-omission.ngrok-free.dev/payment/pay/callback"
-    }
-
-    async with httpx.AsyncClient() as client:
-        res = await client.post(
-            f"{Config.SQUAD_BASE_URL}/transaction/initiate/process-payment",
-            json=body,
-            headers=headers
-        )
-
-    data = res.json()
-    print("Charge card response:", data)
-    return data
-
-
-
-@payment_router.post("/test/authorize-payment")
-async def test_authorize_payment(
-    transaction_reference: str,
-    pin: str = None,
-    otp: str = None
-):
-    """Test endpoint - Authorize payment with PIN or OTP"""
-    headers = {
-        "Authorization": f"Bearer {Config.SQUAD_SECRET_KEY}",
-        "Content-Type": "application/json"
-    }
-
-    # Build authorization object
-    authorization = {}
-    if pin:
-        authorization["pin"] = pin
-    if otp:
-        authorization["otp"] = otp
-
-    body = {
-        "transaction_reference": transaction_reference,
-        "authorization": authorization
-    }
-
-    async with httpx.AsyncClient() as client:
-        res = await client.post(
-            f"{Config.SQUAD_BASE_URL}/transaction/payment/authorize",
-            json=body,
-            headers=headers
-        )
-
-    data = res.json()
-    print("Authorize response:", data)
-    return data

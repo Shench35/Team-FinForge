@@ -13,15 +13,27 @@ export interface AuthResponse {
   token: string;
 }
 
+interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+interface RegisterData {
+  fullName: string;
+  email: string;
+  password: string;
+  organisation?: string;
+}
+
 export const authApi = {
-  login: (credentials: any) => 
+  login: (credentials: LoginCredentials) => 
     request<AuthResponse>({
       method: 'POST',
       path: '/login',
       body: credentials,
     }),
 
-  register: (data: any) => {
+  register: (data: RegisterData) => {
     // Split fullName into firstName and lastName for backend compatibility
     const nameParts = data.fullName.trim().split(' ');
     const firstName = nameParts[0] || '';

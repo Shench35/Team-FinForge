@@ -3,7 +3,7 @@ const BASE = 'https://4184-102-89-76-190.ngrok-free.app';
 interface RequestOptions {
   method: string;
   path: string;
-  body?: any;
+  body?: unknown;
   isMultipart?: boolean;
 }
 
@@ -12,6 +12,11 @@ export const request = async <T>({ method, path, body, isMultipart = false }: Re
   const headers: Record<string, string> = {
     ...(token && { Authorization: `Bearer ${token}` }),
   };
+  const requestBody: BodyInit | undefined = isMultipart
+    ? (body as BodyInit | undefined)
+    : body !== undefined
+      ? JSON.stringify(body)
+      : undefined;
 
   if (!isMultipart) {
     headers['Content-Type'] = 'application/json';
@@ -20,7 +25,7 @@ export const request = async <T>({ method, path, body, isMultipart = false }: Re
   const response = await fetch(`${BASE}${path}`, {
     method,
     headers,
-    body: isMultipart ? body : body ? JSON.stringify(body) : undefined,
+    body: requestBody,
   });
 
   const data = await response.json();
@@ -31,8 +36,8 @@ export const request = async <T>({ method, path, body, isMultipart = false }: Re
 };
 
 export const get = (path: string) => request({ method: 'GET', path });
-export const post = (path: string, body?: any, isMultipart = false) =>
+export const post = (path: string, body?: unknown, isMultipart = false) =>
   request({ method: 'POST', path, body, isMultipart });
-export const patch = (path: string, body: any) => request({ method: 'PATCH', path, body });
-export const put = (path: string, body: any) => request({ method: 'PUT', path, body });
+export const patch = (path: string, body: unknown) => request({ method: 'PATCH', path, body });
+export const put = (path: string, body: unknown) => request({ method: 'PUT', path, body });
 export const del = (path: string) => request({ method: 'DELETE', path });

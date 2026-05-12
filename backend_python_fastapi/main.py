@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend_python_fastapi.payment import payment_router
-from backend_python_fastapi.DB.main import create_db
-
+from payment import payment_router
+from DB.main import create_db
+from pipeline_route import pipeline_router
 # Create FastAPI app instance
 app = FastAPI(
     title="Team FinForge API",
@@ -26,6 +26,7 @@ async def on_startup():
 
 # Include routers
 app.include_router(payment_router, prefix="/payment", tags=["Payment"])
+app.include_router(pipeline_router, prefix="/AI_pipeline", tags=["AI"])
 
 # Root endpoint
 @app.get("/")

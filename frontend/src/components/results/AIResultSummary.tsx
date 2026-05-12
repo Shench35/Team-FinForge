@@ -42,7 +42,7 @@ export const AIResultSummary = ({
       {/* Verdict Info */}
       <div className="space-y-4 text-center">
         <h2 className="text-2xl font-bold text-on-surface">{config.title}</h2>
-        <VerdictBadge verdict={verdict} size="md" />
+        <VerdictBadge verdict={verdict} />
       </div>
 
       {/* AI Summary */}

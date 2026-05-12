@@ -70,7 +70,7 @@ export const TrustScoreRing = ({
       </div>
 
       {/* Verdict Badge */}
-      <VerdictBadge verdict={verdict} size="md" />
+      <VerdictBadge verdict={verdict} />
     </div>
   );
 };

@@ -27,8 +27,9 @@ const Register = () => {
       const response = await authApi.register({ fullName, email, password, organisation });
       login(response.token, response.user);
       navigate('/plan-select');
-    } catch (err: any) {
-      setError(err.message || 'Registration failed. Please try again.');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Registration failed. Please try again.';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -81,7 +82,7 @@ const Register = () => {
         />
 
         <div className="relative">
-          <label className="block text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest mb-2 flex justify-between">
+          <label className="flex justify-between text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest mb-2">
             ORGANISATION <span className="text-[9px] font-medium lowercase opacity-60 italic">optional</span>
           </label>
           <Input

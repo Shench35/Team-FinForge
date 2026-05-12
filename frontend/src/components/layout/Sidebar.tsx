@@ -1,29 +1,29 @@
-import { Link, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  FileCheck, 
-  History, 
-  BarChart3, 
-  Settings, 
-  LifeBuoy, 
+import { Link, useLocation } from "react-router-dom";
+import {
+  LayoutDashboard,
+  FileCheck,
+  History,
+  BarChart3,
+  Settings,
+  LifeBuoy,
   LogOut,
-} from 'lucide-react';
-import { clsx } from 'clsx';
-import { Logo } from './Logo';
-import { Button } from '../../ui/Button';
+} from "lucide-react";
+import { clsx } from "clsx";
+import { Logo } from "./Logo";
+import { Button } from "../../ui/Button";
 
 const navLinks = [
-  { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
-  { label: 'New Verification', icon: FileCheck, path: '/verify' },
-  { label: 'History', icon: History, path: '/history' },
-  { label: 'Analytics', icon: BarChart3, path: '/analytics' },
-  { label: 'Settings', icon: Settings, path: '/settings' },
+  { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+  { label: "New Verification", icon: FileCheck, path: "/verify" },
+  { label: "History", icon: History, path: "/history" },
+  { label: "Analytics", icon: BarChart3, path: "/analytics" },
+  { label: "Settings", icon: Settings, path: "/settings" },
 ];
 
 export const Sidebar = () => {
   const location = useLocation();
 
-  const NavItem = ({ item }: { item: typeof navLinks[0] }) => {
+  const NavItem = ({ item }: { item: (typeof navLinks)[0] }) => {
     const isActive = location.pathname === item.path;
     const Icon = item.icon;
 
@@ -31,16 +31,20 @@ export const Sidebar = () => {
       <Link
         to={item.path}
         className={clsx(
-          'flex items-center gap-3 px-4 py-3 rounded-sm transition-all duration-200 group',
-          isActive 
-            ? 'bg-[#F1F5F9] text-primary font-bold border-r-4 border-primary' 
-            : 'text-on-surface-variant hover:bg-surface-container-high hover:text-primary'
+          "flex items-center gap-3 px-4 py-3 rounded-sm transition-all duration-200 group",
+          isActive
+            ? "bg-[#F1F5F9] text-primary font-bold border-r-4 border-primary"
+            : "text-on-surface-variant hover:bg-surface-container-high hover:text-primary",
         )}
       >
-        <Icon className={clsx(
-          'w-5 h-5 transition-transform group-hover:scale-110',
-          isActive ? 'text-primary' : 'text-on-surface-variant group-hover:text-primary'
-        )} />
+        <Icon
+          className={clsx(
+            "w-5 h-5 transition-transform group-hover:scale-110",
+            isActive
+              ? "text-primary"
+              : "text-on-surface-variant group-hover:text-primary",
+          )}
+        />
         <span className="text-sm tracking-tight">{item.label}</span>
       </Link>
     );
@@ -67,7 +71,10 @@ export const Sidebar = () => {
         {/* Upgrade Box */}
         <div className="mt-20 mx-2 p-4 rounded-sm bg-[#0F172A] text-white relative overflow-hidden group">
           <div className="relative z-10">
-            <Button variant="primary" className="w-full h-10 text-[10px] font-bold uppercase tracking-widest bg-primary hover:bg-primary/90 border-none">
+            <Button
+              variant="primary"
+              className="w-full h-10 text-[10px] font-bold uppercase tracking-widest bg-primary hover:bg-primary/90 border-none"
+            >
               Upgrade Plan
             </Button>
           </div>
@@ -76,7 +83,10 @@ export const Sidebar = () => {
 
       {/* Footer Nav */}
       <div className="p-4 space-y-1 border-t border-outline-variant/40">
-        <Link to="/support" className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary transition-colors">
+        <Link
+          to="/support"
+          className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary transition-colors"
+        >
           <LifeBuoy className="w-4 h-4" />
           <span className="text-sm">Support</span>
         </Link>

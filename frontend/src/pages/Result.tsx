@@ -1,18 +1,18 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { AIResultSummary } from '../components/results/AIResultSummary';
-import { DimensionBreakdown } from '../components/results/DimensionBreakdown';
-import { AnomalyList } from '../components/results/AnomalyList';
-import { AuditTrail } from '../components/results/AuditTrail';
-import { ResultActions } from '../components/results/ResultActions';
-import { PageLayout } from '../components/layout/PageLayout';
-import { Alert } from '../ui/Alert';
-import { Card } from '../ui/Card';
-import { Spinner } from '../ui/Spinner';
-import { get } from '../utils/api';
+import { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { AIResultSummary } from "../components/results/AIResultSummary";
+import { DimensionBreakdown } from "../components/results/DimensionBreakdown";
+import { AnomalyList } from "../components/results/AnomalyList";
+import { AuditTrail } from "../components/results/AuditTrail";
+import { ResultActions } from "../components/results/ResultActions";
+import { PageLayout } from "../components/layout/PageLayout";
+import { Alert } from "../ui/Alert";
+import { Card } from "../ui/Card";
+import { Spinner } from "../ui/Spinner";
+import { get } from "../utils/api";
 
-type Verdict = 'LIKELY_AUTHENTIC' | 'SUSPICIOUS' | 'HIGH_RISK';
-type Severity = 'LOW' | 'MEDIUM' | 'HIGH';
+type Verdict = "LIKELY_AUTHENTIC" | "SUSPICIOUS" | "HIGH_RISK";
+type Severity = "LOW" | "MEDIUM" | "HIGH";
 
 interface ResultAnomaly {
   id: string;
@@ -26,7 +26,7 @@ interface ResultAnomaly {
 interface ResultAuditEvent {
   timestamp: string;
   event: string;
-  icon?: 'check' | 'upload' | 'brain' | 'score' | 'report';
+  icon?: "check" | "upload" | "brain" | "score" | "report";
 }
 
 interface VerificationReport {
@@ -51,39 +51,44 @@ interface VerificationReport {
 }
 
 const asObject = (value: unknown): Record<string, unknown> | null => {
-  if (typeof value === 'object' && value !== null) {
+  if (typeof value === "object" && value !== null) {
     return value as Record<string, unknown>;
   }
   return null;
 };
 
 const asString = (value: unknown, fallback: string): string => {
-  return typeof value === 'string' ? value : fallback;
+  return typeof value === "string" ? value : fallback;
 };
 
 const asNumber = (value: unknown, fallback: number): number => {
-  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
 };
 
 const toVerdict = (value: unknown): Verdict => {
-  if (value === 'LIKELY_AUTHENTIC' || value === 'SUSPICIOUS' || value === 'HIGH_RISK') {
+  if (
+    value === "LIKELY_AUTHENTIC" ||
+    value === "SUSPICIOUS" ||
+    value === "HIGH_RISK"
+  ) {
     return value;
   }
-  return 'SUSPICIOUS';
+  return "SUSPICIOUS";
 };
 
 const toSeverity = (value: unknown): Severity => {
-  if (value === 'LOW' || value === 'MEDIUM' || value === 'HIGH') {
+  if (value === "LOW" || value === "MEDIUM" || value === "HIGH") {
     return value;
   }
-  return 'MEDIUM';
+  return "MEDIUM";
 };
 
 const fallbackReport = (id: string): VerificationReport => ({
   id,
-  verdict: 'SUSPICIOUS',
+  verdict: "SUSPICIOUS",
   trustScore: 62,
-  aiSummary: 'Analysis completed with minor anomalies. Manual review is recommended.',
+  aiSummary:
+    "Analysis completed with minor anomalies. Manual review is recommended.",
   fileName: `verification-${id}.pdf`,
   dimensions: {
     visualAuthenticity: 65,
@@ -93,24 +98,40 @@ const fallbackReport = (id: string): VerificationReport => ({
   },
   anomalies: [
     {
-      id: 'anom-1',
-      fieldName: 'Seal Placement',
-      severity: 'MEDIUM',
-      description: 'Alignment differs from institutional template by 4mm.',
+      id: "anom-1",
+      fieldName: "Seal Placement",
+      severity: "MEDIUM",
+      description: "Alignment differs from institutional template by 4mm.",
       confidence: 87,
-      anomalyId: 'ANOM-001',
+      anomalyId: "ANOM-001",
     },
   ],
   audit: {
     events: [
-      { timestamp: new Date().toISOString(), event: 'Verification initiated', icon: 'check' },
-      { timestamp: new Date().toISOString(), event: 'OCR extraction completed', icon: 'upload' },
-      { timestamp: new Date().toISOString(), event: 'AI analysis complete', icon: 'brain' },
-      { timestamp: new Date().toISOString(), event: 'Report generated', icon: 'report' },
+      {
+        timestamp: new Date().toISOString(),
+        event: "Verification initiated",
+        icon: "check",
+      },
+      {
+        timestamp: new Date().toISOString(),
+        event: "OCR extraction completed",
+        icon: "upload",
+      },
+      {
+        timestamp: new Date().toISOString(),
+        event: "AI analysis complete",
+        icon: "brain",
+      },
+      {
+        timestamp: new Date().toISOString(),
+        event: "Report generated",
+        icon: "report",
+      },
     ],
-    systemId: 'VERIFY-NODE-ALPHA-9',
+    systemId: "VERIFY-NODE-ALPHA-9",
     transactionRef: `TX-${id}`,
-    complianceTags: ['GDPR'],
+    complianceTags: ["GDPR"],
   },
 });
 
@@ -121,17 +142,21 @@ const normalizeReport = (payload: unknown, id: string): VerificationReport => {
   const dimensionsRaw = asObject(raw.dimensions);
   const anomaliesRaw = Array.isArray(raw.anomalies) ? raw.anomalies : [];
   const auditRaw = asObject(raw.auditTrail) ?? asObject(raw.audit);
-  const eventsRaw = auditRaw && Array.isArray(auditRaw.events) ? auditRaw.events : [];
+  const eventsRaw =
+    auditRaw && Array.isArray(auditRaw.events) ? auditRaw.events : [];
 
   const anomalies: ResultAnomaly[] = anomaliesRaw.map((item, index) => {
     const entry = asObject(item);
     return {
       id: asString(entry?.id, `anomaly-${index + 1}`),
-      fieldName: asString(entry?.fieldName ?? entry?.field, 'Unknown Field'),
+      fieldName: asString(entry?.fieldName ?? entry?.field, "Unknown Field"),
       severity: toSeverity(entry?.severity),
-      description: asString(entry?.description, 'No anomaly description available.'),
+      description: asString(
+        entry?.description,
+        "No anomaly description available.",
+      ),
       confidence: asNumber(entry?.confidence, 0),
-      anomalyId: asString(entry?.anomalyId, ''),
+      anomalyId: asString(entry?.anomalyId, ""),
     };
   });
 
@@ -139,10 +164,15 @@ const normalizeReport = (payload: unknown, id: string): VerificationReport => {
     const entry = asObject(event);
     return {
       timestamp: asString(entry?.timestamp, new Date().toISOString()),
-      event: asString(entry?.event, 'Processing event'),
-      icon: entry?.icon === 'check' || entry?.icon === 'upload' || entry?.icon === 'brain' || entry?.icon === 'score' || entry?.icon === 'report'
-        ? entry.icon
-        : undefined,
+      event: asString(entry?.event, "Processing event"),
+      icon:
+        entry?.icon === "check" ||
+        entry?.icon === "upload" ||
+        entry?.icon === "brain" ||
+        entry?.icon === "score" ||
+        entry?.icon === "report"
+          ? entry.icon
+          : undefined,
     };
   });
 
@@ -150,21 +180,38 @@ const normalizeReport = (payload: unknown, id: string): VerificationReport => {
     id: asString(raw.id, id),
     verdict: toVerdict(raw.verdict),
     trustScore: asNumber(raw.trustScore ?? raw.score, 62),
-    aiSummary: asString(raw.aiSummary ?? raw.summary, 'Analysis completed.'),
-    fileName: asString(raw.fileName ?? raw.documentName, `verification-${id}.pdf`),
+    aiSummary: asString(raw.aiSummary ?? raw.summary, "Analysis completed."),
+    fileName: asString(
+      raw.fileName ?? raw.documentName,
+      `verification-${id}.pdf`,
+    ),
     dimensions: {
-      visualAuthenticity: asNumber(dimensionsRaw?.visualAuthenticity ?? raw.visualAuthenticity, 65),
-      textIntegrity: asNumber(dimensionsRaw?.textIntegrity ?? raw.textIntegrity, 58),
-      structuralPattern: asNumber(dimensionsRaw?.structuralPattern ?? raw.structuralPattern, 68),
-      metadataConsistency: asNumber(dimensionsRaw?.metadataConsistency ?? raw.metadataConsistency, 72),
+      visualAuthenticity: asNumber(
+        dimensionsRaw?.visualAuthenticity ?? raw.visualAuthenticity,
+        65,
+      ),
+      textIntegrity: asNumber(
+        dimensionsRaw?.textIntegrity ?? raw.textIntegrity,
+        58,
+      ),
+      structuralPattern: asNumber(
+        dimensionsRaw?.structuralPattern ?? raw.structuralPattern,
+        68,
+      ),
+      metadataConsistency: asNumber(
+        dimensionsRaw?.metadataConsistency ?? raw.metadataConsistency,
+        72,
+      ),
     },
     anomalies,
     audit: {
       events,
-      systemId: asString(auditRaw?.systemId, 'VERIFY-NODE-ALPHA-9'),
+      systemId: asString(auditRaw?.systemId, "VERIFY-NODE-ALPHA-9"),
       transactionRef: asString(auditRaw?.transactionRef, `TX-${id}`),
       complianceTags: Array.isArray(auditRaw?.complianceTags)
-        ? auditRaw.complianceTags.filter((tag): tag is string => typeof tag === 'string')
+        ? auditRaw.complianceTags.filter(
+            (tag): tag is string => typeof tag === "string",
+          )
         : [],
     },
   };
@@ -175,11 +222,11 @@ export default function Result() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const verificationId = id ?? 'unknown';
+  const verificationId = id ?? "unknown";
   const statePayload = (location.state as { report?: unknown } | null)?.report;
 
   const [report, setReport] = useState<VerificationReport | null>(
-    statePayload ? normalizeReport(statePayload, verificationId) : null
+    statePayload ? normalizeReport(statePayload, verificationId) : null,
   );
   const [loading, setLoading] = useState(!statePayload);
   const [error, setError] = useState<string | null>(null);
@@ -197,7 +244,10 @@ export default function Result() {
         setReport(normalizeReport(response, verificationId));
       } catch (fetchError: unknown) {
         if (cancelled) return;
-        const message = fetchError instanceof Error ? fetchError.message : 'Failed to load verification report.';
+        const message =
+          fetchError instanceof Error
+            ? fetchError.message
+            : "Failed to load verification report.";
         setError(message);
         setReport((previous) => previous ?? fallbackReport(verificationId));
       } finally {
@@ -217,12 +267,12 @@ export default function Result() {
   const actions = useMemo(() => {
     return {
       onDownload: () => window.print(),
-      onVerifyAnother: () => navigate('/verify'),
+      onVerifyAnother: () => navigate("/verify"),
       onExport: () => window.print(),
-      onManualOverride: () => navigate('/dashboard'),
-      onRequestReVerification: () => navigate('/verify'),
+      onManualOverride: () => navigate("/dashboard"),
+      onRequestReVerification: () => navigate("/verify"),
       onGenerateFraudReport: () => window.print(),
-      onFlagForReview: () => navigate('/dashboard'),
+      onFlagForReview: () => navigate("/dashboard"),
     };
   }, [navigate]);
 
@@ -247,7 +297,13 @@ export default function Result() {
   return (
     <PageLayout>
       <div className="space-y-6">
-        {error && <Alert type="warning" message={error} onClose={() => setError(null)} />}
+        {error && (
+          <Alert
+            type="warning"
+            message={error}
+            onClose={() => setError(null)}
+          />
+        )}
 
         <AIResultSummary
           verdict={report.verdict}

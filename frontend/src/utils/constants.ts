@@ -12,6 +12,7 @@ export const PLAN_DOC_FEATURES = {
     'Standard Email Support',
     'Digital Certificates',
     'Standard processing',
+    'Basic PDF report',
   ],
   PRO_MAX: [
     '50 Verifications / mo',
@@ -26,6 +27,9 @@ export const PLAN_DOC_FEATURES = {
     'Full API & Webhooks',
     'Custom Branding',
     'Priority queue processing',
+    'Bulk verification tools',
+    'Dedicated account manager',
+    'Full Forensic Audit',
   ],
 } as const;
 

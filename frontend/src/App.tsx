@@ -2,7 +2,7 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate,
+
 } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/layout/ProtectedRoute";
@@ -15,6 +15,8 @@ import PlanSelect from "./pages/PlanSelect";
 import Dashboard from "./pages/Dashboard";
 import Verify from "./pages/Verify";
 import Result from "./pages/Result";
+import Pricing from "./pages/Pricing";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -23,14 +25,7 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Landing />} />
-          <Route
-            path="/pricing"
-            element={
-              <div className="p-20 text-center text-4xl font-bold">
-                Pricing Page (Awaiting UI)
-              </div>
-            }
-          />
+          <Route path="/pricing" element={<Pricing isPublicOnly={true} />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/plan-select" element={<PlanSelect />} />
@@ -41,6 +36,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/plans"
+            element={
+              <ProtectedRoute>
+                <Pricing />
               </ProtectedRoute>
             }
           />
@@ -64,7 +68,7 @@ function App() {
           />
 
           {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
     </AuthProvider>

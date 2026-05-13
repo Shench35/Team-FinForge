@@ -7,6 +7,7 @@ import {
   Settings,
   LifeBuoy,
   LogOut,
+  CreditCard,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { Logo } from "./Logo";
@@ -15,8 +16,9 @@ import { Button } from "../../ui/Button";
 const navLinks = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { label: "New Verification", icon: FileCheck, path: "/verify" },
-  { label: "History", icon: History, path: "/history" },
+  {label: "History", icon: History, path: "/history" },
   { label: "Analytics", icon: BarChart3, path: "/analytics" },
+  { label: "Plans & Upgrade", icon: CreditCard, path: "/plans" },
   { label: "Settings", icon: Settings, path: "/settings" },
 ];
 

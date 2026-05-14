@@ -15,7 +15,7 @@ const Dashboard = () => {
     <DashboardLayout>
       <div className="space-y-12">
         {/* Top Header & Greeting */}
-        <DashboardHeader userName={userName} />
+        <DashboardHeader user={user} />
 
         {/* Core Metrics Grid */}
         <QuickStats />

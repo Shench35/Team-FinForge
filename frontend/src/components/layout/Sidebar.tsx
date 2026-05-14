@@ -13,10 +13,12 @@ import { clsx } from "clsx";
 import { Logo } from "./Logo";
 import { Button } from "../../ui/Button";
 
+import { useAuth } from "../../hooks/useAuth";
+
 const navLinks = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { label: "New Verification", icon: FileCheck, path: "/verify" },
-  {label: "History", icon: History, path: "/history" },
+  { label: "History", icon: History, path: "/history" },
   { label: "Analytics", icon: BarChart3, path: "/analytics" },
   { label: "Plans & Upgrade", icon: CreditCard, path: "/plans" },
   { label: "Settings", icon: Settings, path: "/settings" },
@@ -24,6 +26,7 @@ const navLinks = [
 
 export const Sidebar = () => {
   const location = useLocation();
+  const { user, logout } = useAuth();
 
   const NavItem = ({ item }: { item: (typeof navLinks)[0] }) => {
     const isActive = location.pathname === item.path;
@@ -70,15 +73,17 @@ export const Sidebar = () => {
           <NavItem key={link.path} item={link} />
         ))}
 
-        {/* Upgrade Box */}
-        <div className="mt-20 mx-2 p-4 rounded-sm bg-[#0F172A] text-white relative overflow-hidden group">
-          <div className="relative z-10">
-            <Button
-              variant="primary"
-              className="w-full h-10 text-[10px] font-bold uppercase tracking-widest bg-primary hover:bg-primary/90 border-none"
-            >
-              Upgrade Plan
-            </Button>
+        {/* User Profile Summary (Dynamic) */}
+        <div className="mt-12 mx-2 p-4 rounded-sm border border-outline-variant/30 bg-white shadow-sm">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[9px] font-bold text-on-surface-variant/40 uppercase tracking-widest">Current Plan</span>
+              <span className="text-[9px] font-black text-secondary uppercase bg-secondary/10 px-2 py-0.5 rounded-full">{user?.plan || 'PRO'}</span>
+            </div>
+            <div className="pt-2 border-t border-outline-variant/20">
+              <p className="text-xs font-bold text-primary truncate">{user?.fullName || 'Anonymous'}</p>
+              <p className="text-[10px] text-on-surface-variant truncate">{user?.email || ''}</p>
+            </div>
           </div>
         </div>
       </nav>
@@ -90,11 +95,14 @@ export const Sidebar = () => {
           className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary transition-colors"
         >
           <LifeBuoy className="w-4 h-4" />
-          <span className="text-sm">Support</span>
+          <span className="text-sm font-medium">Support Center</span>
         </Link>
-        <button className="flex items-center gap-3 w-full px-4 py-3 text-on-surface-variant hover:text-error transition-colors">
-          <LogOut className="w-4 h-4" />
-          <span className="text-sm">Logout</span>
+        <button 
+          onClick={logout}
+          className="flex items-center gap-3 w-full px-4 py-3 text-on-surface-variant hover:text-error transition-colors group"
+        >
+          <LogOut className="w-4 h-4 group-hover:scale-110 transition-transform" />
+          <span className="text-sm font-medium">Log out</span>
         </button>
       </div>
     </aside>

@@ -23,7 +23,7 @@ const Login = () => {
 
     try {
       const response = await authApi.login({ email, password });
-      login(response.token, response.user);
+      await login(response.token, response.user);
       navigate("/dashboard");
     } catch (err: unknown) {
       const message =

@@ -30,7 +30,7 @@ const Register = () => {
         password,
         organisation,
       });
-      login(response.token, response.user);
+      await login(response.token, response.user);
       navigate("/plan-select");
     } catch (err: unknown) {
       const message =

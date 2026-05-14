@@ -55,7 +55,7 @@ export const authApi = {
   getMe: () =>
     request<User>({
       method: "GET",
-      path: "/users/me", // Adjusted based on common patterns, update if different
+      path: "/profile",
     }),
 
   updatePlan: (plan: string) =>

@@ -7,6 +7,7 @@ export interface AuthContextType {
   login: (token: string, user: User) => void;
   logout: () => void;
   updateUser: (user: User) => void;
+  refreshProfile: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -37,9 +38,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     initAuth();
   }, []);
 
-  const login = (token: string, userData: User) => {
+  const refreshProfile = async () => {
+    try {
+      const userData = await authApi.getMe();
+      setUser(userData);
+    } catch (error) {
+      console.error('Failed to refresh profile:', error);
+    }
+  };
+
+  const login = async (token: string, userData: User) => {
     localStorage.setItem('finforge_token', token);
     setUser(userData);
+    // Immediately fetch full profile after login to ensure all database fields are present
+    await refreshProfile();
   };
 
   const logout = () => {
@@ -52,7 +64,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, updateUser, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

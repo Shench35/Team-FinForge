@@ -1,4 +1,4 @@
-const BASE = "https://4184-102-89-76-190.ngrok-free.app";
+const BASE = "https://fond-dory-suitable.ngrok-free.app";
 
 interface RequestOptions {
   method: string;
@@ -16,6 +16,7 @@ export const request = async <T>({
   const token = localStorage.getItem("finforge_token");
   const headers: Record<string, string> = {
     ...(token && { Authorization: `Bearer ${token}` }),
+    "ngrok-skip-browser-warning": "true",
   };
   const requestBody: BodyInit | undefined = isMultipart
     ? (body as BodyInit | undefined)

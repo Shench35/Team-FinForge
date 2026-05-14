@@ -5,7 +5,11 @@ interface DashboardHeaderProps {
   userName: string;
 }
 
-export const DashboardHeader = ({ userName }: DashboardHeaderProps) => {
+export const DashboardHeader = ({ user }: { user: any }) => {
+  const userName = user?.fullName?.split(' ')[0] || 'User';
+  const planName = user?.plan || 'PRO';
+  const cap = planName === 'ENTERPRISE' ? 'Unlimited' : planName === 'PRO_MAX' ? '50 / mo' : '10 / mo';
+
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
       <div className="space-y-1">
@@ -25,10 +29,10 @@ export const DashboardHeader = ({ userName }: DashboardHeaderProps) => {
           </div>
           <div>
             <p className="text-[9px] font-bold text-on-surface-variant/60 uppercase tracking-widest">
-              Verification Cap
+              Plan: {planName}
             </p>
             <p className="text-xl font-display font-bold text-primary">
-              Unlimited
+              {cap}
             </p>
           </div>
         </div>

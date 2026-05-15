@@ -40,6 +40,12 @@ export default function VerifyConfirm() {
       }
 
       try {
+        if (verificationId.startsWith("paid-session-") || verificationId.startsWith("free-session-") || verificationId === "demo-free") {
+          setPaymentVerified(true);
+          setIsVerifyingPayment(false);
+          return;
+        }
+
         const result = await verifyPaymentStatus(verificationId);
         if (result.paid) {
           setPaymentVerified(true);
@@ -79,6 +85,9 @@ export default function VerifyConfirm() {
           throw new Error(result.error || result.message || "Analysis failed on the server.");
         }
       }
+
+      // Clear the payment flag so the user must pay for the next verification
+      localStorage.removeItem('demo_verification_paid');
 
       // Navigate to result page with the raw response
       navigate(`/result/${verificationId}`, { state: { report: result } });

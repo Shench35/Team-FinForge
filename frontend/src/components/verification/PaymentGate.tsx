@@ -4,7 +4,9 @@ import { Card } from '../../ui/Card';
 import { PLAN_PRICES, PLAN_LABELS } from '../../utils/constants';
 
 interface PaymentGateProps {
-  planType: 'FREE' | 'PRO' | 'PRO_MAX' | 'ENTERPRISE';
+  planType?: 'FREE' | 'PRO' | 'PRO_MAX' | 'ENTERPRISE';
+  titleOverride?: string;
+  priceOverride?: string;
   documentCount: number;
   paymentUrl: string;
   onPaymentInitiated?: () => void;
@@ -13,12 +15,14 @@ interface PaymentGateProps {
 
 export const PaymentGate = ({ 
   planType, 
+  titleOverride,
+  priceOverride,
   documentCount, 
   paymentUrl, 
   onPaymentInitiated,
 }: PaymentGateProps) => {
-  const price = PLAN_PRICES[planType];
-  const label = PLAN_LABELS[planType];
+  const price = priceOverride || (planType ? PLAN_PRICES[planType] : '₦0');
+  const label = titleOverride || (planType ? PLAN_LABELS[planType] : 'Item');
 
   const handleSameTabPay = () => {
     // This will redirect the user away, but we saved the file to IndexedDB already
@@ -35,7 +39,7 @@ export const PaymentGate = ({
           <div className="space-y-1">
             <h2 className="text-2xl font-bold text-on-surface">Secure Payment Required</h2>
             <p className="text-on-surface-variant text-sm">
-              Complete payment to unlock your {label} analysis.
+              Complete payment to unlock your {label}.
             </p>
           </div>
         </div>

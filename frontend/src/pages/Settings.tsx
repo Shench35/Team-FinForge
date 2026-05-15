@@ -3,41 +3,11 @@ import { useAuth } from '../hooks/useAuth';
 import { Card } from '../ui/Card';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
-import { useState } from 'react';
-import { User, Mail, Building, Shield, Lock, Key, Copy, CheckCircle2, Eye, EyeOff } from 'lucide-react';
-import { purchaseApiCredits } from '../api/verification';
+import { User, Mail, Building, Shield, Lock } from 'lucide-react';
 
 const Settings = () => {
   const { user } = useAuth();
   
-  const [apiKey, setApiKey] = useState<string | null>(null);
-  const [showKey, setShowKey] = useState(false);
-  const [isGeneratingKey, setIsGeneratingKey] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [credits, setCredits] = useState(0);
-
-  const handleGenerateKey = async () => {
-    if (!user?.email) return;
-    setIsGeneratingKey(true);
-    try {
-      const response = await purchaseApiCredits(user.email);
-      setApiKey(response.api_key);
-      setCredits(10); // Give 10 credits on first generation for demo
-    } catch (err) {
-      console.error("Failed to generate API Key", err);
-    } finally {
-      setIsGeneratingKey(false);
-    }
-  };
-
-  const handleCopyKey = () => {
-    if (apiKey) {
-      navigator.clipboard.writeText(apiKey);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
   return (
     <DashboardLayout>
       <div className="space-y-8 max-w-4xl">
@@ -144,79 +114,6 @@ const Settings = () => {
               <p className="text-[10px] text-on-surface-variant/60 italic text-center">
                 Password updates are currently disabled in this demo environment.
               </p>
-            </div>
-          </Card>
-
-          {/* Developer / B2B API Settings */}
-          <Card className="p-8 space-y-6">
-            <div className="flex items-center gap-3 border-b border-outline-variant pb-4">
-              <Key className="w-5 h-5 text-secondary" />
-              <h2 className="text-xl font-bold text-on-surface">Developer Settings</h2>
-            </div>
-            
-            <div className="space-y-6">
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div className="space-y-1">
-                  <h3 className="font-bold text-on-surface">API Access Key</h3>
-                  <p className="text-sm text-on-surface-variant">
-                    Use this key to authenticate your requests to the FinForge Verification API.
-                  </p>
-                </div>
-                {!apiKey && (
-                  <Button 
-                    variant="primary" 
-                    className="h-10 font-bold uppercase tracking-widest text-[10px]"
-                    onClick={handleGenerateKey}
-                    disabled={isGeneratingKey}
-                  >
-                    {isGeneratingKey ? "Generating..." : "Generate Key"}
-                  </Button>
-                )}
-              </div>
-
-              {apiKey && (
-                <div className="p-4 bg-surface-container-low border border-outline-variant rounded-sm space-y-4">
-                  <div className="flex items-center justify-between">
-                    <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Your Secret Key</label>
-                    <button 
-                      onClick={() => setShowKey(!showKey)}
-                      className="text-xs text-secondary font-bold hover:underline flex items-center gap-1"
-                    >
-                      {showKey ? <><EyeOff className="w-3 h-3" /> Hide</> : <><Eye className="w-3 h-3" /> Show</>}
-                    </button>
-                  </div>
-                  
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1 p-3 bg-white border border-outline-variant rounded font-mono text-sm text-on-surface overflow-x-auto">
-                      {showKey ? apiKey : "cvfy_••••••••••••••••••••••••••••••••"}
-                    </div>
-                    <Button 
-                      variant="outlined" 
-                      className="h-11 px-4 border-outline-variant"
-                      onClick={handleCopyKey}
-                    >
-                      {copied ? <CheckCircle2 className="w-4 h-4 text-secondary" /> : <Copy className="w-4 h-4" />}
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex items-center justify-between p-4 bg-[#F8FAFC] border border-outline-variant rounded-sm mt-4">
-                <div className="space-y-1">
-                  <h3 className="font-bold text-on-surface">API Credit Balance</h3>
-                  <p className="text-xs text-on-surface-variant">1 credit = 1 successful verification</p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <span className="text-2xl font-display font-bold text-primary">{credits}</span>
-                  </div>
-                  {credits === 0 ? (
-                    <Button variant="primary" className="h-9 px-4 font-bold uppercase tracking-widest text-[10px]">
-                      Top Up
-                    </Button>
-                  ) : null}
-                </div>
-              </div>
             </div>
           </Card>
         </div>

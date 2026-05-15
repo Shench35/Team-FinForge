@@ -7,6 +7,7 @@ import {
   LifeBuoy,
   LogOut,
   CreditCard,
+  Terminal,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { Logo } from "./Logo";
@@ -19,6 +20,7 @@ const navLinks = [
   { label: "New Verification", icon: FileCheck, path: "/verify" },
   { label: "History", icon: History, path: "/history" },
   { label: "Plans & Upgrade", icon: CreditCard, path: "/plans" },
+  { label: "Developer API", icon: Terminal, path: "/developer" },
   { label: "Settings", icon: Settings, path: "/settings" },
 ];
 

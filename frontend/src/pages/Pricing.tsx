@@ -54,9 +54,9 @@ export default function Pricing({ isPublicOnly = false }: { isPublicOnly?: boole
           documentCount={1}
           paymentUrl={paymentUrl}
           onPaymentInitiated={() => {
-            // For demo purposes, we'll just redirect to dashboard upon "payment"
+            // For demo purposes, we navigate to the success page upon "payment"
             // In a real app, backend webhooks would handle the actual plan upgrade.
-            navigate('/dashboard');
+            navigate('/payment-success');
           }}
         />
       </DashboardLayout>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreditCard, ShieldCheck, ArrowRight } from "lucide-react";
 import { PaymentGate } from "../components/verification/PaymentGate";
@@ -21,6 +21,13 @@ export default function Verify() {
   const [paymentUrl, setPaymentUrl] = useState<string>("");
   const [showPaymentGate, setShowPaymentGate] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+
+  // Check if user already paid for a verification in this demo session
+  useEffect(() => {
+    if (localStorage.getItem('demo_verification_paid') === 'true') {
+      navigate(`/verify/confirm?verificationId=paid-session-${Date.now()}`);
+    }
+  }, [navigate]);
 
   const planType: PlanType = useMemo(() => {
     if (!user?.plan) return "FREE";
@@ -71,8 +78,8 @@ export default function Verify() {
         documentCount={1}
         paymentUrl={paymentUrl}
         onPaymentInitiated={() => {
-          // User says they paid in new tab — redirect to confirm page
-          navigate(`/verify/confirm?verificationId=${verificationId}`);
+          localStorage.setItem('demo_verification_paid', 'true');
+          navigate('/payment-success');
         }}
       />
     );

@@ -18,7 +18,9 @@ import VerifyConfirm from "./pages/VerifyConfirm";
 import Result from "./pages/Result";
 import Pricing from "./pages/Pricing";
 import Settings from "./pages/Settings";
+import Developer from "./pages/Developer";
 import Support from "./pages/Support";
+import PaymentSuccess from "./pages/PaymentSuccess";
 import NotFound from "./pages/NotFound";
 
 function App() {
@@ -89,10 +91,28 @@ function App() {
           />
 
           <Route
+            path="/developer"
+            element={
+              <ProtectedRoute>
+                <Developer />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/support"
             element={
               <ProtectedRoute>
                 <Support />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/payment-success"
+            element={
+              <ProtectedRoute>
+                <PaymentSuccess />
               </ProtectedRoute>
             }
           />

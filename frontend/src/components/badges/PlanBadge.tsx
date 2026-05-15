@@ -10,7 +10,8 @@ interface PlanBadgeProps {
 }
 
 export const PlanBadge = ({ plan, size = 'sm', className }: PlanBadgeProps) => {
-  const colors = {
+  const colors: Record<PlanTier, string> = {
+    FREE: 'bg-gray-100 text-gray-700',
     PRO: 'bg-blue-100 text-blue-700',
     PRO_MAX: 'bg-purple-100 text-purple-700',
     ENTERPRISE: 'bg-green-100 text-green-700',

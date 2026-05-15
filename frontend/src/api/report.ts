@@ -42,6 +42,11 @@ export interface VerificationReport {
 
 type ReportPayload = Partial<VerificationReport> & {
   score?: number;
+  document_score?: number;
+  document_verdict?: string;
+  extracted_info?: Record<string, unknown>;
+  flagged_issues?: Array<unknown>;
+  message?: string;
   summary?: string;
   documentName?: string;
   visualAuthenticity?: number;
@@ -72,12 +77,14 @@ const asNumber = (value: unknown, fallback: number): number => {
 };
 
 const toVerdict = (value: unknown): Verdict => {
-  if (
-    value === "LIKELY_AUTHENTIC" ||
-    value === "SUSPICIOUS" ||
-    value === "HIGH_RISK"
-  ) {
-    return value;
+  if (value === "AUTHENTIC" || value === "LIKELY_AUTHENTIC") {
+    return "LIKELY_AUTHENTIC";
+  }
+  if (value === "SUSPICIOUS") {
+    return "SUSPICIOUS";
+  }
+  if (value === "HIGH_RISK" || value === "UNAUTHENTIC") {
+    return "HIGH_RISK";
   }
   return "SUSPICIOUS";
 };
@@ -162,7 +169,11 @@ export const normalizeVerificationReport = (
   if (!raw) return fallbackReport(id);
 
   const dimensionsRaw = asObject(raw.dimensions);
-  const anomaliesRaw = Array.isArray(raw.anomalies) ? raw.anomalies : [];
+  const anomaliesRaw = Array.isArray(raw.anomalies) 
+    ? raw.anomalies 
+    : Array.isArray(raw.flagged_issues) 
+      ? raw.flagged_issues 
+      : [];
   const auditRaw = raw.auditTrail ?? raw.audit;
   const eventsRaw = Array.isArray(auditRaw?.events) ? auditRaw.events : [];
 
@@ -196,11 +207,21 @@ export const normalizeVerificationReport = (
       )
     : [];
 
+  let aiSummary = asString(raw.aiSummary ?? raw.summary ?? raw.message, "Analysis completed.");
+  if (raw.extracted_info) {
+    const details = raw.extracted_info;
+    const name = asString(details.candidate_name, "");
+    const year = asString(details.exam_year, "");
+    if (name) aiSummary = `Certificate for ${name} (${year}) verified. ${aiSummary}`;
+  }
+
+  const trustScore = asNumber(raw.document_score ?? raw.trustScore ?? raw.score, 0);
+
   return {
     id: asString(raw.id, id),
-    verdict: toVerdict(raw.verdict),
-    trustScore: asNumber(raw.trustScore ?? raw.score, 62),
-    aiSummary: asString(raw.aiSummary ?? raw.summary, "Analysis completed."),
+    verdict: toVerdict(raw.document_verdict ?? raw.verdict),
+    trustScore,
+    aiSummary,
     fileName: asString(
       raw.fileName ?? raw.documentName,
       `verification-${id}.pdf`,
@@ -208,19 +229,19 @@ export const normalizeVerificationReport = (
     dimensions: {
       visualAuthenticity: asNumber(
         dimensionsRaw?.visualAuthenticity ?? raw.visualAuthenticity,
-        65,
+        trustScore,
       ),
       textIntegrity: asNumber(
         dimensionsRaw?.textIntegrity ?? raw.textIntegrity,
-        58,
+        trustScore,
       ),
       structuralPattern: asNumber(
         dimensionsRaw?.structuralPattern ?? raw.structuralPattern,
-        68,
+        trustScore,
       ),
       metadataConsistency: asNumber(
         dimensionsRaw?.metadataConsistency ?? raw.metadataConsistency,
-        72,
+        trustScore,
       ),
     },
     anomalies,

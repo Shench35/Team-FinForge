@@ -1,14 +1,12 @@
 import { ShieldCheck, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../../ui/Button';
 
-interface DashboardHeaderProps {
-  userName: string;
-}
-
 export const DashboardHeader = ({ user }: { user: any }) => {
-  const userName = user?.fullName?.split(' ')[0] || 'User';
-  const planName = user?.plan || 'PRO';
-  const cap = planName === 'ENTERPRISE' ? 'Unlimited' : planName === 'PRO_MAX' ? '50 / mo' : '10 / mo';
+  const navigate = useNavigate();
+  const userName = user?.firstName || 'User';
+  const planName = user?.plan || 'FREE';
+  const cap = planName === 'ENTERPRISE' ? 'Unlimited' : planName === 'PRO_MAX' ? '20 / mo' : planName === 'PRO' ? '10 / mo' : '3 / mo';
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
@@ -37,9 +35,13 @@ export const DashboardHeader = ({ user }: { user: any }) => {
           </div>
         </div>
 
-        {/* Action Button (Desktop only here, Mobile might handle differently) */}
+        {/* Action Button */}
         <div className="hidden md:block">
-          <Button variant="primary" className="h-14 px-8 font-bold uppercase tracking-widest text-xs flex items-center gap-2 bg-[#006C4E] hover:bg-[#005a41]">
+          <Button 
+            variant="primary" 
+            className="h-14 px-8 font-bold uppercase tracking-widest text-xs flex items-center gap-2 bg-[#006C4E] hover:bg-[#005a41]"
+            onClick={() => navigate('/verify')}
+          >
             <Plus className="w-4 h-4" />
             New Verification
           </Button>

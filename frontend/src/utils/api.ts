@@ -5,6 +5,8 @@ interface RequestOptions {
   path: string;
   body?: unknown;
   isMultipart?: boolean;
+  baseUrl?: string;
+  noAuth?: boolean;
 }
 
 export const request = async <T>({
@@ -12,8 +14,10 @@ export const request = async <T>({
   path,
   body,
   isMultipart = false,
+  baseUrl = BASE,
+  noAuth = false,
 }: RequestOptions): Promise<T> => {
-  const token = localStorage.getItem("finforge_token");
+  const token = noAuth ? null : localStorage.getItem("finforge_token");
   const headers: Record<string, string> = {
     ...(token && { Authorization: `Bearer ${token}` }),
     "ngrok-skip-browser-warning": "true",
@@ -28,7 +32,7 @@ export const request = async <T>({
     headers["Content-Type"] = "application/json";
   }
 
-  const response = await fetch(`${BASE}${path}`, {
+  const response = await fetch(`${baseUrl}${path}`, {
     method,
     headers,
     body: requestBody,
@@ -36,7 +40,8 @@ export const request = async <T>({
 
   const data = await response.json();
   if (!response.ok) {
-    throw new Error(data.message || "Request failed");
+    const errorMessage = data.detail || data.message || "Request failed";
+    throw new Error(errorMessage);
   }
   return data as T;
 };

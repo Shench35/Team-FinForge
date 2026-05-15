@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthLayout } from "../components/layout/AuthLayout";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
 import { useAuth } from "../hooks/useAuth";
 import { authApi } from "../api/auth";
-import { ShieldCheck } from "lucide-react";
+import { ShieldCheck, CheckCircle2 } from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -15,6 +15,8 @@ const Login = () => {
 
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const justRegistered = (location.state as { registered?: boolean } | null)?.registered;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +52,15 @@ const Login = () => {
       bottomLink={bottomLink}
     >
       <form onSubmit={handleSubmit} className="space-y-6">
+        {justRegistered && (
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/5 border border-secondary/20">
+            <CheckCircle2 className="w-5 h-5 text-secondary flex-shrink-0" />
+            <p className="text-[11px] font-bold text-secondary uppercase tracking-wider">
+              Account created successfully. Please log in.
+            </p>
+          </div>
+        )}
+
         <Input
           label="EMAIL ADDRESS"
           type="email"

@@ -1,41 +1,29 @@
 import { useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { FileUpload } from "../components/verification/FileUpload";
-import { OrderSummary } from "../components/verification/OrderSummary";
+import { useNavigate } from "react-router-dom";
+import { CreditCard, ShieldCheck, ArrowRight } from "lucide-react";
 import { PaymentGate } from "../components/verification/PaymentGate";
-import { ProcessingView } from "../components/verification/ProcessingView";
 import { StepIndicator } from "../components/verification/StepIndicator";
 import { PageLayout } from "../components/layout/PageLayout";
 import { Alert } from "../ui/Alert";
 import { Card } from "../ui/Card";
+import { Button } from "../ui/Button";
 import { useAuth } from "../hooks/useAuth";
 import { useVerification } from "../hooks/useVerification";
-import { usePollStatus } from "../hooks/usePollStatus";
+import { PLAN_PRICES_NUMERIC, PLAN_PRICES, PLAN_LABELS } from "../utils/constants";
 
-type PlanType = "PRO" | "PRO_MAX" | "ENTERPRISE";
-type FlowStage = "upload" | "payment" | "processing";
+type PlanType = "FREE" | "PRO" | "PRO_MAX" | "ENTERPRISE";
 
 export default function Verify() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const { user } = useAuth();
-  const initialVerificationId = searchParams.get("verificationId");
-  const initialPaymentState = searchParams.get("payment");
-  const initialFlowStage: FlowStage =
-    initialVerificationId && initialPaymentState === "success"
-      ? "processing"
-      : "upload";
 
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [verificationId, setVerificationId] = useState<string | null>(
-    initialVerificationId,
-  );
+  const [verificationId, setVerificationId] = useState<string | null>(null);
   const [paymentUrl, setPaymentUrl] = useState<string>("");
-  const [flowStage, setFlowStage] = useState<FlowStage>(initialFlowStage);
+  const [showPaymentGate, setShowPaymentGate] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
 
   const planType: PlanType = useMemo(() => {
-    if (!user?.plan) return "PRO";
+    if (!user?.plan) return "FREE";
     return user.plan;
   }, [user?.plan]);
 
@@ -46,77 +34,46 @@ export default function Verify() {
     resetError,
   } = useVerification();
 
-  const {
-    currentStep,
-    isFailed,
-    error: pollError,
-  } = usePollStatus({
-    verificationId,
-    enabled: flowStage === "processing" && Boolean(verificationId),
-    onComplete: () => {
-      if (verificationId) {
-        navigate(`/result/${verificationId}`);
-      }
-    },
-    onFailure: (message) => {
-      setLocalError(message);
-    },
-  });
-
-  const handleStartPayment = async () => {
-    if (selectedFiles.length === 0) {
-      setLocalError(
-        "Please upload at least one document before proceeding to payment.",
-      );
-      return;
-    }
-
+  const handleContinueToPayment = async () => {
     resetError();
     setLocalError(null);
 
+    if (planType === "FREE") {
+      navigate(`/verify/confirm?verificationId=free-session-${Date.now()}`);
+      return;
+    }
+
     try {
+      const amount = PLAN_PRICES_NUMERIC[planType];
+      const email = user?.email || "demo@example.com";
+
       const {
         verificationId: resolvedVerificationId,
         paymentUrl: resolvedPaymentUrl,
-      } = await startVerification(selectedFiles);
+      } = await startVerification(email, amount);
 
       setVerificationId(resolvedVerificationId);
       setPaymentUrl(resolvedPaymentUrl);
-      setFlowStage("payment");
-      navigate(`/verify?verificationId=${resolvedVerificationId}`, {
-        replace: true,
-      });
+      setShowPaymentGate(true);
     } catch (submitError: unknown) {
       const message =
         submitError instanceof Error
           ? submitError.message
-          : "Failed to initialize verification.";
+          : "Failed to initialize payment.";
       setLocalError(message);
     }
   };
 
-  const handlePaymentInitiated = () => {
-    setFlowStage("processing");
-    setLocalError(null);
-  };
-
-  if (flowStage === "payment" && verificationId) {
+  if (showPaymentGate && verificationId) {
     return (
       <PaymentGate
         planType={planType}
-        documentCount={selectedFiles.length || 1}
+        documentCount={1}
         paymentUrl={paymentUrl}
-        onPaymentInitiated={handlePaymentInitiated}
-      />
-    );
-  }
-
-  if (flowStage === "processing" && verificationId) {
-    return (
-      <ProcessingView
-        currentStep={currentStep}
-        isComplete={currentStep >= 6 && !isFailed}
-        isFailed={isFailed}
+        onPaymentInitiated={() => {
+          // User says they paid in new tab — redirect to confirm page
+          navigate(`/verify/confirm?verificationId=${verificationId}`);
+        }}
       />
     );
   }
@@ -129,47 +86,86 @@ export default function Verify() {
             New Verification
           </h1>
           <p className="text-sm text-on-surface-variant">
-            Upload your documents, complete payment, and we will run a full AI
-            trust analysis.
+            Complete payment first, then upload your certificate for AI analysis.
           </p>
         </div>
 
         <StepIndicator currentStep={1} isProcessing={false} />
 
-        {(localError || verificationError || pollError) && (
+        {(localError || verificationError) && (
           <Alert
             type="error"
-            message={
-              localError ??
-              verificationError ??
-              pollError ??
-              "Something went wrong."
-            }
+            message={localError ?? verificationError ?? "Something went wrong."}
             onClose={() => setLocalError(null)}
           />
         )}
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <Card className="space-y-5 p-6 lg:col-span-2">
-            <h2 className="text-lg font-semibold text-on-surface">
-              Upload Documents
-            </h2>
-            <FileUpload
-              planType={planType}
-              onFilesSelected={setSelectedFiles}
-              onContinue={handleStartPayment}
-            />
-          </Card>
+        <div className="max-w-2xl mx-auto">
+          <Card className="p-8 space-y-8">
+            {/* Plan Summary */}
+            <div className="flex items-center gap-4 border-b border-outline-variant pb-6">
+              <div className="w-14 h-14 rounded-full bg-secondary/10 flex items-center justify-center">
+                <ShieldCheck className="w-7 h-7 text-secondary" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-xl font-bold text-on-surface">
+                  {PLAN_LABELS[planType]} Plan
+                </h2>
+                <p className="text-sm text-on-surface-variant">
+                  AI-powered certificate verification
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-2xl font-display font-bold text-primary">
+                  {PLAN_PRICES[planType]}
+                </p>
+                <p className="text-[10px] text-on-surface-variant uppercase tracking-widest">per verification</p>
+              </div>
+            </div>
 
-          <OrderSummary
-            planType={planType}
-            documentCount={selectedFiles.length}
-            onPayClick={
-              selectedFiles.length > 0 && !isSubmitting
-                ? handleStartPayment
-                : undefined
-            }
-          />
+            {/* What's Included */}
+            <div className="space-y-3">
+              <h3 className="text-xs font-bold text-on-surface-variant/60 uppercase tracking-widest">What&apos;s included</h3>
+              <ul className="space-y-2">
+                {[
+                  "Deep AI document analysis",
+                  "Trust score & verdict report",
+                  "Flagged issues breakdown",
+                  "Candidate detail extraction",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-sm text-on-surface">
+                    <div className="w-5 h-5 rounded-full bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                      <span className="text-[10px] text-secondary font-bold">✓</span>
+                    </div>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* CTA */}
+            <Button
+              variant="primary"
+              size="lg"
+              className="w-full h-14 text-lg font-bold bg-secondary hover:bg-secondary/90 shadow-lg shadow-secondary/20"
+              onClick={handleContinueToPayment}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                "Initializing..."
+              ) : (
+                <>
+                  <CreditCard className="w-5 h-5 mr-2" />
+                  Continue to Payment
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </>
+              )}
+            </Button>
+
+            <p className="text-[10px] text-center text-on-surface-variant/60 italic">
+              After payment, you'll upload your certificate and receive instant AI analysis results.
+            </p>
+          </Card>
         </div>
       </div>
     </PageLayout>

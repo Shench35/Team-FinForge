@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthLayout } from "../components/layout/AuthLayout";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
-import { useAuth } from "../hooks/useAuth";
 import { authApi } from "../api/auth";
 import { Lock, ShieldCheck } from "lucide-react";
 
@@ -15,7 +14,6 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -24,14 +22,13 @@ const Register = () => {
     setError(null);
 
     try {
-      const response = await authApi.register({
+      await authApi.register({
         fullName,
         email,
         password,
         organisation,
       });
-      await login(response.token, response.user);
-      navigate("/plan-select");
+      navigate("/login", { state: { registered: true } });
     } catch (err: unknown) {
       const message =
         err instanceof Error

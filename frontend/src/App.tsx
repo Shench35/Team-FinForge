@@ -14,8 +14,11 @@ import Landing from "./pages/Landing";
 import PlanSelect from "./pages/PlanSelect";
 import Dashboard from "./pages/Dashboard";
 import Verify from "./pages/Verify";
+import VerifyConfirm from "./pages/VerifyConfirm";
 import Result from "./pages/Result";
 import Pricing from "./pages/Pricing";
+import Settings from "./pages/Settings";
+import Support from "./pages/Support";
 import NotFound from "./pages/NotFound";
 
 function App() {
@@ -59,10 +62,37 @@ function App() {
           />
 
           <Route
+            path="/verify/confirm"
+            element={
+              <ProtectedRoute>
+                <VerifyConfirm />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/result/:id"
             element={
               <ProtectedRoute>
                 <Result />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/support"
+            element={
+              <ProtectedRoute>
+                <Support />
               </ProtectedRoute>
             }
           />

@@ -1,9 +1,8 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   FileCheck,
   History,
-  BarChart3,
   Settings,
   LifeBuoy,
   LogOut,
@@ -11,7 +10,7 @@ import {
 } from "lucide-react";
 import { clsx } from "clsx";
 import { Logo } from "./Logo";
-import { Button } from "../../ui/Button";
+
 
 import { useAuth } from "../../hooks/useAuth";
 
@@ -19,13 +18,13 @@ const navLinks = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { label: "New Verification", icon: FileCheck, path: "/verify" },
   { label: "History", icon: History, path: "/history" },
-  { label: "Analytics", icon: BarChart3, path: "/analytics" },
   { label: "Plans & Upgrade", icon: CreditCard, path: "/plans" },
   { label: "Settings", icon: Settings, path: "/settings" },
 ];
 
 export const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
 
   const NavItem = ({ item }: { item: (typeof navLinks)[0] }) => {
@@ -78,7 +77,7 @@ export const Sidebar = () => {
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <span className="text-[9px] font-bold text-on-surface-variant/40 uppercase tracking-widest">Current Plan</span>
-              <span className="text-[9px] font-black text-secondary uppercase bg-secondary/10 px-2 py-0.5 rounded-full">{user?.plan || 'PRO'}</span>
+              <span className="text-[9px] font-black text-secondary uppercase bg-secondary/10 px-2 py-0.5 rounded-full">{user?.plan || 'FREE'}</span>
             </div>
             <div className="pt-2 border-t border-outline-variant/20">
               <p className="text-xs font-bold text-primary truncate">{user?.fullName || 'Anonymous'}</p>
@@ -98,7 +97,10 @@ export const Sidebar = () => {
           <span className="text-sm font-medium">Support Center</span>
         </Link>
         <button 
-          onClick={logout}
+          onClick={() => {
+            logout();
+            navigate('/login');
+          }}
           className="flex items-center gap-3 w-full px-4 py-3 text-on-surface-variant hover:text-error transition-colors group"
         >
           <LogOut className="w-4 h-4 group-hover:scale-110 transition-transform" />

@@ -33,40 +33,68 @@ const extractResponse = <T>(value: unknown): T => {
   return {} as T;
 };
 
-export const parseVerificationId = (
-  value: UploadVerificationResponse,
-): string | null => {
-  return value.verificationId ?? value.id ?? null;
-};
+const DEMO_BASE = "https://junkman-thrash-omission.ngrok-free.dev";
 
-export const parsePaymentUrl = (
-  value: PaymentVerificationResponse,
-): string | null => {
-  return value.paymentUrl ?? value.url ?? null;
-};
+export interface AIAnalysisResponse {
+  success: boolean;
+  document_score?: number;
+  document_verdict?: string;
+  extracted_info?: {
+    candidate_name: string;
+    exam_year: string;
+    registration_number: string;
+  };
+  flagged_issues?: string[];
+  message?: string;
+  error?: string;
+  type_mismatch?: boolean;
+  detected_type?: string;
+}
 
-export const uploadVerification = async (files: File[]) => {
+export interface PaymentInitiateResponse {
+  checkout_url: string;
+  transaction_ref: string;
+}
+
+export interface PaymentVerifyResponse {
+  paid: boolean;
+  status: string;
+  amount: number;
+  email: string;
+  transaction_ref: string;
+}
+
+export const uploadVerification = async (file: File, certType: string) => {
   const formData = new FormData();
-  files.forEach((file) => formData.append("files", file));
+  formData.append("file", file);
+  formData.append("cert_type", certType);
 
-  const response = await request<UploadVerificationResponse>({
+  return request<AIAnalysisResponse>({
     method: "POST",
-    path: "/api/verification/upload",
+    path: "/AI_pipeline/verify/analyse",
     body: formData,
     isMultipart: true,
+    baseUrl: DEMO_BASE,
   });
-
-  return extractResponse<UploadVerificationResponse>(response);
 };
 
-export const initiateVerificationPayment = async (verificationId: string) => {
-  const response = await request<PaymentVerificationResponse>({
+export const initiateVerificationPayment = async (email: string, amount: number) => {
+  // Guide says POST with query params
+  return request<PaymentInitiateResponse>({
     method: "POST",
-    path: "/api/verification/pay",
-    body: { verificationId },
+    path: `/payment/pay/initiate?email=${encodeURIComponent(email)}&amount_naira=${amount}`,
+    baseUrl: DEMO_BASE,
+    noAuth: true,
   });
+};
 
-  return extractResponse<PaymentVerificationResponse>(response);
+export const verifyPaymentStatus = async (transactionRef: string) => {
+  return request<PaymentVerifyResponse>({
+    method: "GET",
+    path: `/payment/pay/verify/${transactionRef}`,
+    baseUrl: DEMO_BASE,
+    noAuth: true,
+  });
 };
 
 export const fetchVerificationStatus = async (verificationId: string) => {
@@ -76,4 +104,12 @@ export const fetchVerificationStatus = async (verificationId: string) => {
   });
 
   return extractResponse<VerificationStatusResponse>(response);
+};
+
+export const purchaseApiCredits = async (email: string) => {
+  return request<{ api_key: string }>({
+    method: "POST",
+    path: `/third_party/api/v1/credits/purchase?email=${encodeURIComponent(email)}`,
+    baseUrl: DEMO_BASE,
+  });
 };

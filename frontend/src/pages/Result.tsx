@@ -32,6 +32,9 @@ export default function Result() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // If we already have data from the analysis (via navigation state), don't fetch
+    if (statePayload) return;
+
     let cancelled = false;
 
     const loadReport = async () => {
@@ -41,12 +44,7 @@ export default function Result() {
       try {
         const fetchedReport = await fetchVerificationReport(verificationId);
         if (cancelled) return;
-
-        setReport(
-          statePayload
-            ? normalizeVerificationReport(statePayload, verificationId)
-            : fetchedReport,
-        );
+        setReport(fetchedReport);
       } catch (fetchError: unknown) {
         if (cancelled) return;
 

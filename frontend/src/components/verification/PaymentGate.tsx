@@ -1,115 +1,100 @@
-import { useMemo, useState } from "react";
-import { Card } from "../../ui/Card";
-import { Button } from "../../ui/Button";
-import { Alert } from "../../ui/Alert";
-import { PLAN_LABELS, PLAN_PRICES } from "../../utils/constants";
+import { ShieldCheck, ExternalLink, ArrowRight } from 'lucide-react';
+import { Button } from '../../ui/Button';
+import { Card } from '../../ui/Card';
+import { PLAN_PRICES, PLAN_LABELS } from '../../utils/constants';
 
 interface PaymentGateProps {
-  planType: "PRO" | "PRO_MAX" | "ENTERPRISE";
+  planType: 'FREE' | 'PRO' | 'PRO_MAX' | 'ENTERPRISE';
   documentCount: number;
   paymentUrl: string;
   onPaymentInitiated?: () => void;
+  onClose?: () => void;
 }
 
-export const PaymentGate = ({
-  planType,
-  documentCount,
-  paymentUrl,
+export const PaymentGate = ({ 
+  planType, 
+  documentCount, 
+  paymentUrl, 
   onPaymentInitiated,
 }: PaymentGateProps) => {
-  const [error, setError] = useState<string | null>(null);
-  const planLabel = PLAN_LABELS[planType];
-  const planPrice = PLAN_PRICES[planType];
+  const price = PLAN_PRICES[planType];
+  const label = PLAN_LABELS[planType];
 
-  const safePaymentUrl = useMemo(() => {
-    try {
-      const parsedUrl = new URL(paymentUrl, window.location.origin);
-      return parsedUrl.protocol === "https:" ? parsedUrl.toString() : null;
-    } catch {
-      return null;
-    }
-  }, [paymentUrl]);
-
-  const handlePayment = () => {
-    if (!safePaymentUrl) {
-      setError("Payment link is invalid. Please try again.");
-      return;
-    }
-
-    setError(null);
-    onPaymentInitiated?.();
-    // Redirect to Squad payment URL
-    window.location.assign(safePaymentUrl);
+  const handleSameTabPay = () => {
+    // This will redirect the user away, but we saved the file to IndexedDB already
+    window.location.assign(paymentUrl);
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-surface p-4">
-      <Card elevated className="w-full max-w-md space-y-6 p-8">
-        {error && <Alert type="error" message={error} />}
-
-        {/* Header */}
-        <div>
-          <h2 className="text-2xl font-bold text-on-surface">
-            Complete Payment
-          </h2>
-          <p className="mt-2 text-sm text-on-surface-variant">
-            Proceed to Squad checkout to complete your verification.
-          </p>
+    <div className="max-w-2xl mx-auto py-12 px-4">
+      <Card className="p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="flex items-center gap-4 border-b border-outline-variant pb-6">
+          <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center">
+            <ShieldCheck className="w-8 h-8 text-secondary" />
+          </div>
+          <div className="space-y-1">
+            <h2 className="text-2xl font-bold text-on-surface">Secure Payment Required</h2>
+            <p className="text-on-surface-variant text-sm">
+              Complete payment to unlock your {label} analysis.
+            </p>
+          </div>
         </div>
 
-        {/* Summary */}
-        <div className="space-y-3 rounded-lg bg-surface-container-low p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-on-surface-variant">Plan</span>
-            <span className="font-medium text-on-surface">{planLabel}</span>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant">
+            <p className="text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest mb-1">Items</p>
+            <p className="font-bold text-on-surface">{documentCount} Document</p>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-on-surface-variant">Documents</span>
-            <span className="font-medium text-on-surface">{documentCount}</span>
+          <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant text-right">
+            <p className="text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest mb-1">Total Due</p>
+            <p className="text-xl font-display font-bold text-primary">{price}</p>
           </div>
-          <div className="border-t border-outline-variant pt-3">
-            <div className="flex items-center justify-between">
-              <span className="font-semibold text-on-surface">
-                Total Amount
-              </span>
-              <span className="text-lg font-bold text-secondary">
-                {planPrice}
-              </span>
+        </div>
+
+        <div className="space-y-4 pt-4">
+          <Button 
+            variant="primary" 
+            size="lg" 
+            className="w-full h-14 text-lg font-bold bg-secondary hover:bg-secondary/90 shadow-lg shadow-secondary/20"
+            onClick={handleSameTabPay}
+          >
+            Pay with Squad
+            <ArrowRight className="w-5 h-5 ml-2" />
+          </Button>
+
+          <div className="flex items-center gap-4 py-2">
+            <div className="flex-1 h-px bg-outline-variant" />
+            <span className="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-widest">Or</span>
+            <div className="flex-1 h-px bg-outline-variant" />
+          </div>
+
+          <div className="bg-surface-container-highest/50 rounded-xl p-6 border border-outline-variant/50">
+            <p className="text-xs text-on-surface-variant mb-6 text-center">
+              If you have already completed your payment in another window, click the button below to proceed.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+               <Button 
+                variant="outlined" 
+                className="flex-1 h-12 font-bold text-[11px] uppercase tracking-wider border-outline-variant"
+                onClick={() => window.open(paymentUrl, '_blank')}
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                Pay in New Tab
+              </Button>
+              <Button 
+                variant="primary" 
+                className="flex-1 h-12 font-bold text-[11px] uppercase tracking-wider"
+                onClick={onPaymentInitiated}
+              >
+                I have paid
+              </Button>
             </div>
           </div>
         </div>
 
-        {/* Payment Button */}
-        <Button
-          type="button"
-          variant="primary"
-          size="lg"
-          className="w-full"
-          onClick={handlePayment}
-          disabled={!safePaymentUrl}
-        >
-          Pay with Squad
-        </Button>
-
-        {/* Trust Message */}
-        <div className="space-y-2 rounded-lg bg-surface-container-low p-4">
-          <div className="flex items-start gap-2">
-            <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-secondary/20">
-              <span className="text-xs text-secondary">✓</span>
-            </div>
-            <div className="text-sm text-on-surface">
-              <p className="font-medium">Secure Payment</p>
-              <p className="mt-1 text-xs">
-                CertVerify does not store your card details. Payment processing
-                is handled securely by Squad.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <p className="text-center text-xs text-on-surface-variant">
-          You will be redirected to Squad to complete your payment securely.
+        <p className="text-[10px] text-center text-on-surface-variant/60 italic">
+          Secure payment processed by Squad. Your document remains safe in your browser session.
         </p>
       </Card>
     </div>

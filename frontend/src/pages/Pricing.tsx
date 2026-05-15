@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { PublicNavbar } from '../components/layout/PublicNavbar';
 import { Footer } from '../components/layout/Footer';
@@ -6,9 +8,62 @@ import { ComparisonTable } from '../components/pricing/ComparisonTable';
 import { FAQSection } from '../components/pricing/FAQSection';
 import { useAuth } from '../hooks/useAuth';
 import { Button } from '../ui/Button';
+import { PaymentGate } from '../components/verification/PaymentGate';
+import { useVerification } from '../hooks/useVerification';
+import { PLAN_PRICES_NUMERIC } from '../utils/constants';
+
+type PlanType = "FREE" | "PRO" | "PRO_MAX" | "ENTERPRISE";
 
 export default function Pricing({ isPublicOnly = false }: { isPublicOnly?: boolean }) {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const { startVerification } = useVerification();
+  
+  const [selectedUpgradePlan, setSelectedUpgradePlan] = useState<PlanType | null>(null);
+  const [paymentUrl, setPaymentUrl] = useState<string>("");
+
+  const handleUpgrade = async (plan: string) => {
+    if (isPublicOnly || !user) {
+      navigate('/register');
+      return;
+    }
+
+    if (plan === 'ENTERPRISE') {
+      // Just a placeholder for Enterprise contact
+      window.location.href = "mailto:sales@finforge.ai";
+      return;
+    }
+    
+    try {
+      const amount = PLAN_PRICES_NUMERIC[plan as keyof typeof PLAN_PRICES_NUMERIC];
+      const email = user.email || "demo@example.com";
+      const { paymentUrl: pUrl } = await startVerification(email, amount);
+      
+      setPaymentUrl(pUrl);
+      setSelectedUpgradePlan(plan as PlanType);
+    } catch (err) {
+      console.error("Failed to initialize upgrade payment:", err);
+    }
+  };
+
+  if (selectedUpgradePlan && paymentUrl) {
+    return (
+      <DashboardLayout>
+        <PaymentGate
+          planType={selectedUpgradePlan}
+          documentCount={1}
+          paymentUrl={paymentUrl}
+          onPaymentInitiated={() => {
+            // For demo purposes, we'll just redirect to dashboard upon "payment"
+            // In a real app, backend webhooks would handle the actual plan upgrade.
+            navigate('/dashboard');
+          }}
+        />
+      </DashboardLayout>
+    );
+  }
+
+  const currentPlan = user?.plan || 'FREE';
 
   const content = (
     <div className="max-w-container-max mx-auto px-6 py-12 md:py-24">
@@ -29,17 +84,19 @@ export default function Pricing({ isPublicOnly = false }: { isPublicOnly?: boole
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-32">
         <PlanCard 
           plan="PRO" 
-          onSelect={() => {}} 
+          selected={currentPlan === 'PRO'}
+          onSelect={handleUpgrade} 
         />
         <PlanCard 
           plan="PRO_MAX" 
-          selected={user?.plan === 'PRO_MAX'}
+          selected={currentPlan === 'PRO_MAX'}
           showPopularRibbon
-          onSelect={() => {}} 
+          onSelect={handleUpgrade} 
         />
         <PlanCard 
           plan="ENTERPRISE" 
-          onSelect={() => {}} 
+          selected={currentPlan === 'ENTERPRISE'}
+          onSelect={handleUpgrade} 
         />
       </div>
 

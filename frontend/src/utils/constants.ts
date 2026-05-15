@@ -1,12 +1,18 @@
-export const PLAN_LIMITS = { PRO: 10, PRO_MAX: 50, ENTERPRISE: 100000000 } as const;
+export const PLAN_LIMITS = { FREE: 3, PRO: 10, PRO_MAX: 50, ENTERPRISE: 100000000 } as const;
 
-export const PLAN_LABELS = { PRO: 'Pro', PRO_MAX: 'Pro Max', ENTERPRISE: 'Enterprise' } as const;
+export const PLAN_LABELS = { FREE: 'Free', PRO: 'Pro', PRO_MAX: 'Pro Max', ENTERPRISE: 'Enterprise' } as const;
 
-export const PLAN_PRICES = { PRO: '₦500', PRO_MAX: '₦750', ENTERPRISE: '₦1,200' } as const;
+export const PLAN_PRICES = { FREE: '₦0', PRO: '₦500', PRO_MAX: '₦750', ENTERPRISE: '₦1,200' } as const;
+export const PLAN_PRICES_NUMERIC = { FREE: 0, PRO: 500, PRO_MAX: 750, ENTERPRISE: 1200 } as const;
 
-export const PLAN_COLORS = { PRO: 'blue', PRO_MAX: 'purple', ENTERPRISE: 'green' } as const;
+export const PLAN_COLORS = { FREE: 'gray', PRO: 'blue', PRO_MAX: 'purple', ENTERPRISE: 'green' } as const;
 
 export const PLAN_DOC_FEATURES = {
+  FREE: [
+    '3 Verifications / mo',
+    'Standard Email Support',
+    'Basic AI analysis',
+  ],
   PRO: [
     '10 Verifications / mo',
     'Standard Email Support',
@@ -57,7 +63,7 @@ export const PROCESSING_STEPS = [
   { id: 1, label: 'Payment confirmed',           icon: 'check_circle' },
   { id: 2, label: 'Uploading documents',         icon: 'upload'       },
   { id: 3, label: 'Running OCR extraction',      icon: 'text_fields'  },
-  { id: 4, label: 'Analysing with GPT-4 Vision', icon: 'psychology'   },
+  { id: 4, label: 'Analysing with Gemini 2.5 Flash', icon: 'psychology'   },
   { id: 5, label: 'Calculating trust score',     icon: 'analytics'    },
   { id: 6, label: 'Generating report',           icon: 'description'  },
 ] as const;

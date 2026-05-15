@@ -1,44 +1,16 @@
 import { Filter, Download } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { VerificationRow } from './VerificationRow';
 import { Button } from '../../ui/Button';
 
-const SAMPLE_HISTORY = [
-  {
-    id: '1',
-    fileName: 'BSc_Computer_Science_Lagos_Uni.pdf',
-    date: 'Oct 12, 2023',
-    plan: 'PRO_MAX' as const,
-    status: 'COMPLETED' as const,
-    trustScore: 98,
-    verdict: 'LIKELY_AUTHENTIC' as const,
-  },
-  {
-    id: '2',
-    fileName: 'Diploma_Engineering_YabaTech.pdf',
-    date: 'Oct 11, 2023',
-    plan: 'PRO_MAX' as const,
-    status: 'PROCESSING' as const,
-  },
-  {
-    id: '3',
-    fileName: 'Master_Business_Admin_UI.pdf',
-    date: 'Oct 10, 2023',
-    plan: 'PRO' as const,
-    status: 'FAILED' as const,
-    trustScore: 12,
-    verdict: 'HIGH_RISK' as const,
-  },
-  {
-    id: '4',
-    fileName: 'Certification_Project_Mgmt.pdf',
-    date: 'Oct 09, 2023',
-    plan: 'PRO_MAX' as const,
-    status: 'PENDING_PAYMENT' as const,
-    verdict: 'SUSPICIOUS' as const,
-  },
-];
+interface HistoryTableProps {
+  historyItems: any[];
+  totalCount: number;
+}
 
-export const HistoryTable = () => {
+export const HistoryTable = ({ historyItems, totalCount }: HistoryTableProps) => {
+  const navigate = useNavigate();
+
   return (
     <div className="bg-white rounded-sm border border-outline-variant shadow-sm overflow-hidden">
       {/* Table Header Controls */}
@@ -47,10 +19,10 @@ export const HistoryTable = () => {
           Recent Verification History
         </h3>
         <div className="flex items-center gap-2">
-          <Button variant="outlined" size="sm" className="h-9 w-9 p-0 flex items-center justify-center">
+          <Button variant="outlined" size="sm" className="h-9 w-9 p-0 flex items-center justify-center opacity-40 cursor-not-allowed" title="Coming Soon" disabled>
             <Filter className="w-4 h-4" />
           </Button>
-          <Button variant="outlined" size="sm" className="h-9 w-9 p-0 flex items-center justify-center">
+          <Button variant="outlined" size="sm" className="h-9 w-9 p-0 flex items-center justify-center opacity-40 cursor-not-allowed" title="Coming Soon" disabled>
             <Download className="w-4 h-4" />
           </Button>
         </div>
@@ -67,24 +39,32 @@ export const HistoryTable = () => {
 
       {/* Rows */}
       <div className="divide-y divide-outline-variant">
-        {SAMPLE_HISTORY.map((item) => (
-          <VerificationRow key={item.id} {...item} />
-        ))}
+        {historyItems.length > 0 ? (
+          historyItems.map((item) => (
+            <VerificationRow key={item.id} {...item} />
+          ))
+        ) : (
+          <div className="p-12 text-center">
+            <p className="text-sm text-on-surface-variant">No verification history found.</p>
+          </div>
+        )}
       </div>
 
-      {/* Pagination Footer */}
+      {/* Footer */}
       <div className="flex justify-between items-center px-6 py-4 bg-[#F8FAFC]">
         <p className="text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">
-          Showing 4 of 1,284 verifications
+          Showing {historyItems.length} of {totalCount.toLocaleString()} verifications
         </p>
-        <div className="flex items-center gap-2">
-          <Button variant="outlined" size="sm" className="h-9 font-bold px-4 uppercase tracking-widest text-[10px]">
-            Previous
+        {historyItems.length > 0 && (
+          <Button 
+            variant="outlined" 
+            size="sm" 
+            className="h-9 font-bold px-6 uppercase tracking-widest text-[10px]"
+            onClick={() => navigate('/history')}
+          >
+            View All
           </Button>
-          <Button variant="outlined" size="sm" className="h-9 font-bold px-4 uppercase tracking-widest text-[10px]">
-            Next
-          </Button>
-        </div>
+        )}
       </div>
     </div>
   );

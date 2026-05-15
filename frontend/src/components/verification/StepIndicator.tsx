@@ -1,38 +1,43 @@
 import { Check, Loader2 } from 'lucide-react';
-import { PROCESSING_STEPS } from '../../utils/constants';
+
+const VERIFICATION_STEPS = [
+  { id: 1, label: 'Payment' },
+  { id: 2, label: 'Upload Certificate' },
+  { id: 3, label: 'Get Results' },
+];
 
 interface StepIndicatorProps {
-  currentStep: number; // 1 to 6
+  currentStep: number; // 1 to 3
   isProcessing?: boolean;
 }
 
 export const StepIndicator = ({ currentStep, isProcessing }: StepIndicatorProps) => {
   return (
     <div className="w-full">
-      {/* Mobile view (Simple progress bar + current step name) */}
+      {/* Mobile view */}
       <div className="md:hidden space-y-3">
         <div className="flex justify-between items-end">
           <span className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-            Step {currentStep} of {PROCESSING_STEPS.length}
+            Step {currentStep} of {VERIFICATION_STEPS.length}
           </span>
           <span className="text-sm font-semibold text-primary">
-            {PROCESSING_STEPS[currentStep - 1].label}
+            {VERIFICATION_STEPS[currentStep - 1]?.label}
           </span>
         </div>
         <div className="h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden">
           <div 
             className="h-full bg-secondary transition-all duration-500 ease-out"
-            style={{ width: `${(currentStep / PROCESSING_STEPS.length) * 100}%` }}
+            style={{ width: `${(currentStep / VERIFICATION_STEPS.length) * 100}%` }}
           />
         </div>
       </div>
 
-      {/* Desktop view (Horizontal steps with icons) */}
+      {/* Desktop view */}
       <div className="hidden md:flex items-center justify-between relative">
         {/* Background Line */}
         <div className="absolute top-5 left-0 right-0 h-0.5 bg-outline-variant -z-10" />
         
-        {PROCESSING_STEPS.map((step) => {
+        {VERIFICATION_STEPS.map((step) => {
           const isCompleted = step.id < currentStep;
           const isActive = step.id === currentStep;
 

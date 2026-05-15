@@ -12,10 +12,13 @@ interface UploadedFile {
 }
 
 interface FileUploadProps {
-  planType: "PRO" | "PRO_MAX" | "ENTERPRISE";
+  planType: "FREE" | "PRO" | "PRO_MAX" | "ENTERPRISE";
   onFilesSelected: (files: File[]) => void;
+  onCertTypeChange?: (type: string) => void;
   onContinue?: () => void;
   maxFiles?: number;
+  submitLabel?: string;
+  isSubmitting?: boolean;
 }
 
 const ACCEPTED_TYPES = [
@@ -47,14 +50,24 @@ const validateFile = (file: File): string | null => {
 export const FileUpload = ({
   planType,
   onFilesSelected,
+  onCertTypeChange,
   onContinue,
   maxFiles,
+  submitLabel = "Continue to Payment",
+  isSubmitting = false,
 }: FileUploadProps) => {
   const limit = maxFiles || PLAN_LIMITS[planType];
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [certType, setCertType] = useState("WAEC");
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const hasReachedLimit = uploadedFiles.length >= limit;
+
+  const handleCertTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    setCertType(value);
+    onCertTypeChange?.(value);
+  };
 
   const handleAddFiles = useCallback(
     (files: FileList) => {
@@ -91,8 +104,10 @@ export const FileUpload = ({
       const updatedFiles = [...uploadedFiles, ...newFiles];
       setUploadedFiles(updatedFiles);
       onFilesSelected(updatedFiles.map((f) => f.file));
+      // Trigger initial cert type if not already
+      onCertTypeChange?.(certType);
     },
-    [uploadedFiles, limit, planType, onFilesSelected],
+    [uploadedFiles, limit, planType, onFilesSelected, onCertTypeChange, certType],
   );
 
   const handleDelete = (id: string) => {
@@ -101,7 +116,7 @@ export const FileUpload = ({
     onFilesSelected(updatedFiles.map((f) => f.file));
   };
 
-  const isSingleFileMode = planType === "PRO";
+  const isSingleFileMode = planType === "FREE" || planType === "PRO";
 
   return (
     <div className="space-y-4">
@@ -116,6 +131,24 @@ export const FileUpload = ({
       {error && (
         <Alert type="error" message={error} onClose={() => setError(null)} />
       )}
+
+      {/* Certificate Type Selection */}
+      <div className="space-y-2">
+        <label className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">
+          Certificate Type
+        </label>
+        <select
+          value={certType}
+          onChange={handleCertTypeChange}
+          className="w-full h-12 px-4 rounded border border-outline-variant bg-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-secondary/20"
+        >
+          <option value="WAEC">WAEC (WASSCE)</option>
+          <option value="NECO">NECO (SSCE)</option>
+          <option value="NABTEB">NABTEB</option>
+          <option value="JAMB">JAMB Result</option>
+          <option value="DEGREE">University Degree</option>
+        </select>
+      </div>
 
       {/* Upload Zone */}
       {!hasReachedLimit && (
@@ -223,11 +256,11 @@ export const FileUpload = ({
         <Button
           type="button"
           variant="primary"
-          className="w-full"
+          className="w-full h-14 text-lg font-bold"
           onClick={onContinue}
-          disabled={!onContinue}
+          disabled={!onContinue || isSubmitting}
         >
-          Continue to Payment
+          {isSubmitting ? "Processing..." : submitLabel}
         </Button>
       )}
     </div>

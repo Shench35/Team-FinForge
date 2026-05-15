@@ -4,8 +4,16 @@ export interface User {
   id: string;
   email: string;
   fullName: string;
-  plan: "PRO" | "PRO_MAX" | "ENTERPRISE";
+  plan: "FREE" | "PRO" | "PRO_MAX" | "ENTERPRISE";
   verifiedAt?: string;
+  organisation?: string;
+  stats?: {
+    total: number | string;
+    authentic: number | string;
+    suspicious: number | string;
+    highRisk: number | string;
+  };
+  history?: any[];
 }
 
 export interface AuthResponse {

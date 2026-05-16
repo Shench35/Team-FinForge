@@ -17,7 +17,7 @@ async def run_pipeline(
     cert_type: str = Form(...),
     # token_data: dict = Depends(verify_token)  # ← JWT verification
 ):
-    # # Get email from token — user can't fake this
+    # Get email from token — user can't fake this
     # email = token_data.get("email")
 
     # # Look up their payment
@@ -58,13 +58,13 @@ async def run_pipeline(
         }
 
     # Step 5 — Generate knowledge assessment questions
-    assessment_result = get_assessment(file_bytes, filename, cert_type)
+    # assessment_result = get_assessment(file_bytes, filename, cert_type)
 
-    if not assessment_result.get("questions"):
-        return {
-            "success": False,
-            "error": "Could not generate assessment questions"
-        }
+    # if not assessment_result.get("questions"):
+    #     return {
+    #         "success": False,
+    #         "error": "Could not generate assessment questions"
+    #     }
 
     # Step 6 — Save everything to DB
     # with Session(engine) as session:
@@ -82,6 +82,8 @@ async def run_pipeline(
     #         session.add(transaction)
     #         session.commit()
 
+        print(validation_result)
+
     # Step 7 — Return questions to frontend
     return {
         "success": True,
@@ -91,7 +93,7 @@ async def run_pipeline(
         "document_verdict": validation_result.get("verdict", ""),
         "flagged_issues": validation_result.get("flagged_issues", []),
         "triggered_flags": validation_result.get("triggered_flags", []),
-        "questions": assessment_result.get("questions", []),
+        # "questions": assessment_result.get("questions", []),
         "message": "Document analysed. Please answer the questions below."
     }
 

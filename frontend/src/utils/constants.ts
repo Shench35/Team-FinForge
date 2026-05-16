@@ -1,4 +1,4 @@
-export const PLAN_LIMITS = { FREE: 3, PRO: 10, PRO_MAX: 50, ENTERPRISE: 100000000 } as const;
+export const PLAN_LIMITS = { FREE: 3, PRO: 10, PRO_MAX: 20, ENTERPRISE: 100000000 } as const;
 
 export const PLAN_LABELS = { FREE: 'Free', PRO: 'Pro', PRO_MAX: 'Pro Max', ENTERPRISE: 'Enterprise' } as const;
 
@@ -21,7 +21,7 @@ export const PLAN_DOC_FEATURES = {
     'Basic PDF report',
   ],
   PRO_MAX: [
-    '50 Verifications / mo',
+    '20 Verifications / mo',
     'Priority 24/7 Support',
     'Bulk Upload Feature',
     'API Access (Alpha)',

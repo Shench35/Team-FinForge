@@ -56,6 +56,7 @@ export const authApi = {
         firstName,
         lastName,
         organisation: data.organisation,
+        plan: "FREE",
       },
     });
   },

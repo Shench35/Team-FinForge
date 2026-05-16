@@ -124,7 +124,7 @@ export const FileUpload = ({
       {hasReachedLimit && (
         <Alert
           type="warning"
-          message={`Your ${planType} plan allows a maximum of ${limit} documents. Upgrade for more.`}
+          message={`Your ${planType} plan allows a maximum of ${planType === "ENTERPRISE" ? "Unlimited" : limit} documents. Upgrade for more.`}
         />
       )}
 
@@ -201,7 +201,7 @@ export const FileUpload = ({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <p className="text-sm font-semibold text-on-surface">
-              {uploadedFiles.length} / {limit} documents
+              {uploadedFiles.length} / {planType === "ENTERPRISE" ? "Unlimited" : limit} documents
             </p>
           </div>
 

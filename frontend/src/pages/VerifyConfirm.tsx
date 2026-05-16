@@ -149,6 +149,8 @@ export default function VerifyConfirm() {
           </div>
         )}
 
+
+
         {/* Dismissable Error Card Overlay */}
         {error && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/30 backdrop-blur-sm p-4">

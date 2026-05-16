@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login Page</title>
+  <script src="./js/TW4.js"></script>
+</head>
+
+<body>
+
+<input class="w-90/100 border border-slate-200 rounded-xl bg-slate-100 p-2 mb-1" placeholder="email" type="email" name="" id="em">
+<input class="w-90/100 border border-slate-200 rounded-xl bg-slate-100 p-2 mb-3" placeholder="password" type="password" name="" id="pass">
+  
+  <button onclick="signup()" class="p-2 font-bold text-2xl bg-amber-300 rounded text-black shadow">Register</button>
+  
+  <button onclick="login()" class="p-2 font-bold text-2xl bg-pink-300 rounded text-black shadow">Login</button>
+  
+  <button onclick="login()" class="p-2 font-bold text-2xl bg-green-300 rounded text-black shadow"><a href="http://192.168.0.139:3000/health">Check DB Health</a></button>
+  
+  <button onclick="fetchUsers()" class="mt-1 p-2 font-bold text-2xl bg-blue-300 rounded text-black shadow">Fetch Users</button>
+  
+  <button onclick="login()" class="mt-1 p-2 font-bold text-2xl bg-red-300 rounded text-black shadow"><a href="http://192.168.0.139:3000/users">Users list</a></button>
+  
+  <!--you might have to click on this link because of a mandatory page ngrok directs you to before you'll be able to access the endpoint, this page shows up because of free plan-->
+  <p class="mt-2 text-emerald-600">
+  <a href="https://9b1f-102-89-85-173.ngrok-free.app">https://9b1f-102-89-85-173.ngrok-free.app</a>
+  </p>
+  <script type="text/javascript" charset="utf-8">
+  var email_input = document.getElementById('em');
+  var password_input = document.getElementById('pass');
+  
+  const api = "https://9b1f-102-89-85-173.ngrok-free.app";
+  
+  const api2 = "http://192.168.0.139:3000";//this is local won't work
+  
+  function fetchUsers(){
+    var my_token = localStorage.getItem('finforge_token');
+    var users = getRegisteredUsers(my_token);
+    console.log(users);
+  }
+  function login(){
+    loginUser(email_input.value, password_input.value);
+  }
+  function signup(){
+    registerUser({
+    email: email_input.value,
+    password: password_input.value,
+    firstName: "James",
+    lastName: "O"
+   });
+  }
+  
+
+/**
+ * Fetches the list of registered users from the backend.
+ * @param {string} token - The JWT token obtained from the /login endpoint.
+ */
+async function getRegisteredUsers(token) {
+  /*const API_URL = 'http://192.168.0.139:3000/users';*/
+  
+  const API_URL = api+'/users'
+
+  try {
+    const response = await fetch(API_URL, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      // Handle cases like 401 (Unauthorized) or 403 (Forbidden)
+      const errorData = await response.json();
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+    }
+
+    const users = await response.json();
+    
+    // Process your users list here
+    console.log('Successfully fetched users:', users);
+    return users;
+
+  } catch (error) {
+    console.error('Failed to fetch users:', error.message);
+  }
+}
+
+// Example usage (assuming you have a token saved in localStorage)
+// const myToken = localStorage.getItem('token');
+// getRegisteredUsers(myToken);
+
+    
+async function loginUser(email, password) {
+  try {
+    const response = await fetch(api+'/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      console.log('Login successful:', result.message);
+      // Store the token for future authenticated requests
+      localStorage.setItem('finforge_token', result.token);
+      return result.user;
+    } else {
+      console.error('Login failed:', result.message);
+    }
+  } catch (error) {
+    console.error('Error during login:', error);
+  }
+}
+
+// Example usage:
+// loginUser("jane.doe@example.com", "securePassword123");
+
+
+
+
+async function registerUser(userData) {
+  try {
+    const response = await fetch(api+'/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      console.log('Registration successful:', result.message);
+      return result.user;
+    } else {
+      console.error('Registration failed:', result.message);
+    }
+  } catch (error) {
+    console.error('Error during registration:', error);
+  }
+}
+
+// Example usage:
+// registerUser({
+//   email: "jane.doe@example.com",
+//   password: "securePassword123",
+//   firstName: "Jane",
+//   lastName: "Doe"
+// });
+
+  </script>
+</body>
+
+</html>

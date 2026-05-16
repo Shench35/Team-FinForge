@@ -45,7 +45,7 @@ async def initiate_payment(email: str, amount_naira: float):
         "currency": "NGN",
         "initiate_type": "inline",
         "transaction_ref": transaction_ref,
-        "callback_url": "https://junkman-thrash-omission.ngrok-free.dev/payment/pay/callback"
+        "callback_url": "https://kinship-tropical-junkie.ngrok-free.dev/payment-success"
         }
 
 

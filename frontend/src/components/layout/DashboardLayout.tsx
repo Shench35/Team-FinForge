@@ -31,9 +31,9 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           </div>
 
           <div className="flex items-center gap-6">
-            <button className="text-on-surface-variant hover:text-primary transition-colors text-xs font-bold uppercase tracking-widest">
+            {/* <button className="text-on-surface-variant hover:text-primary transition-colors text-xs font-bold uppercase tracking-widest">
               Pro Plan
-            </button>
+            </button> */}
             <div className="h-8 w-[1px] bg-outline-variant" />
             <button className="relative text-on-surface-variant hover:text-primary transition-colors">
               <Bell className="w-5 h-5" />

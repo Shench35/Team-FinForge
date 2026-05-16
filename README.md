@@ -300,7 +300,7 @@ except:
     return json.loads(fixed)
 ```
 
-**Why This Matters:** Doesn't crash on edge cases. This is production thinking.
+**reason:** Doesn't crash on edge cases.
 
 ### 4. Severity-Weighted Red Flags (Explainability)
 

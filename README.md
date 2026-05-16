@@ -800,6 +800,6 @@ MIT License. See LICENSE file for details.
 
 ---
 
-**Built with ❤️ for African education**
+**Built with for African education**
 
 _Last updated: May 16, 2026_

@@ -15,26 +15,26 @@ ALLOWED_EXTENSIONS = {"image/jpeg", "image/png", "application/pdf"}
 async def run_pipeline(
     file: UploadFile = File(...),
     cert_type: str = Form(...),
-    token_data: dict = Depends(verify_token)  # ← JWT verification
+    # token_data: dict = Depends(verify_token)  # ← JWT verification
 ):
     # Get email from token — user can't fake this
-    email = token_data.get("email")
+    # email = token_data.get("email")
 
-    # Look up their payment
-    with Session(engine) as session:
-        statement = select(Transaction).where(
-            Transaction.email == email,
-            Transaction.status == "success"
-        ).order_by(Transaction.created_at.desc())
-        transaction = session.exec(statement).first()
+    # # Look up their payment
+    # with Session(engine) as session:
+    #     statement = select(Transaction).where(
+    #         Transaction.email == email,
+    #         Transaction.status == "success"
+    #     ).order_by(Transaction.created_at.desc())
+    #     transaction = session.exec(statement).first()
 
-    if not transaction:
-        raise HTTPException(
-            status_code=402,
-            detail="No confirmed payment found for your account."
-        )
+    # if not transaction:
+    #     raise HTTPException(
+    #         status_code=402,
+    #         detail="No confirmed payment found for your account."
+    #     )
 
-    transaction_ref = transaction.transaction_ref
+    # transaction_ref = transaction.transaction_ref
 
     # Step 3 — Read file into memory
     file_bytes = await file.read()
@@ -58,29 +58,31 @@ async def run_pipeline(
         }
 
     # Step 5 — Generate knowledge assessment questions
-    assessment_result = get_assessment(file_bytes, filename, cert_type)
+    # assessment_result = get_assessment(file_bytes, filename, cert_type)
 
-    if not assessment_result.get("questions"):
-        return {
-            "success": False,
-            "error": "Could not generate assessment questions"
-        }
+    # if not assessment_result.get("questions"):
+    #     return {
+    #         "success": False,
+    #         "error": "Could not generate assessment questions"
+    #     }
 
     # Step 6 — Save everything to DB
-    with Session(engine) as session:
-        statement = select(Transaction).where(
-            Transaction.transaction_ref == transaction_ref
-        )
-        transaction = session.exec(statement).first()
-        if transaction:
-            transaction.cert_type = cert_type
-            transaction.verification_result = json.dumps(validation_result)
-            transaction.questions = json.dumps(
-                assessment_result.get("questions", [])
-            )
-            transaction.document_score = validation_result.get("final_score", 0)
-            session.add(transaction)
-            session.commit()
+    # with Session(engine) as session:
+    #     statement = select(Transaction).where(
+    #         Transaction.transaction_ref == transaction_ref
+    #     )
+    #     transaction = session.exec(statement).first()
+    #     if transaction:
+    #         transaction.cert_type = cert_type
+    #         transaction.verification_result = json.dumps(validation_result)
+    #         transaction.questions = json.dumps(
+    #             assessment_result.get("questions", [])
+    #         )
+    #         transaction.document_score = validation_result.get("final_score", 0)
+    #         session.add(transaction)
+    #         session.commit()
+
+        print(validation_result)
 
     # Step 7 — Return questions to frontend
     return {
@@ -91,7 +93,7 @@ async def run_pipeline(
         "document_verdict": validation_result.get("verdict", ""),
         "flagged_issues": validation_result.get("flagged_issues", []),
         "triggered_flags": validation_result.get("triggered_flags", []),
-        "questions": assessment_result.get("questions", []),
+        # "questions": assessment_result.get("questions", []),
         "message": "Document analysed. Please answer the questions below."
     }
 

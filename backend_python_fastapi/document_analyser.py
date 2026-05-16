@@ -96,6 +96,7 @@ REFERENCE STANDARDS:
 - Candidate photo expected: {template['has_candidate_photo']}
 - Colour scheme: {template['colour_scheme']}
 - Layout pattern: {template['layout']}
+- The last row of the results table contains "SUBJECT RECORDED" followed by a word like "EIGHT" or "NINE" — this is the subject count, NOT a grade. Do not flag this as invalid.
 
 VALIDATION CHECKS:
 - Verify all required fields are present
@@ -162,7 +163,7 @@ JSON RESPONSE FORMAT:
     # Step 4 — Send to Gemini
     try:
         response = model.generate_content([prompt, image])
-        print("Gemini raw response:", response.text)
+        # print("Gemini raw response:", response.text)
     except Exception as e:
         return {
             "success": False,

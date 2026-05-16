@@ -10,10 +10,9 @@ from DB.model import Transaction
 from DB.main import Session, engine
 from sqlmodel import select
 from datetime import datetime
-from auth_dependencies import AccessTokenBearer
+from auth_dependencies import verify_token
 
 payment_router = APIRouter()
-access_token_bearer = AccessTokenBearer()
 processed_transactions = set()
 
 

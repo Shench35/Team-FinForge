@@ -2,7 +2,7 @@ from sqlmodel import SQLModel, create_engine, Session
 from config import Config
 
 engine = create_engine(Config.DATABASE_URL,
-                       echo=False,
+                       echo=True,
                        pool_pre_ping=True,
                        pool_recycle=300
                        )

@@ -135,6 +135,7 @@ app.post("/register", async (req, res) => {
                         firstName,
                         lastName,
                         role: role || "USER", // Use provided role or default to USER
+                        plan: "FREE",
                         organisation,
                   },
                   select: userSelect,

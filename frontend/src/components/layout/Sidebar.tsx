@@ -12,8 +12,8 @@ import {
 import { clsx } from "clsx";
 import { Logo } from "./Logo";
 
-
 import { useAuth } from "../../hooks/useAuth";
+import { useDemoState } from "../../hooks/useDemoState";
 
 const navLinks = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
@@ -28,6 +28,21 @@ export const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { userRole } = useDemoState();
+  const currentPlanLabel =
+    userRole === "developer"
+      ? "DEVELOPER"
+      : userRole === "pro"
+        ? "PRO"
+        : user?.plan || "FREE";
+
+  const filteredNavLinks = navLinks.filter((item) => {
+    if (item.path === "/developer" && userRole !== "developer") {
+      return false;
+    }
+
+    return true;
+  });
 
   const NavItem = ({ item }: { item: (typeof navLinks)[0] }) => {
     const isActive = location.pathname === item.path;
@@ -70,7 +85,7 @@ export const Sidebar = () => {
 
       {/* Main Nav */}
       <nav className="flex-1 px-4 space-y-1">
-        {navLinks.map((link) => (
+        {filteredNavLinks.map((link) => (
           <NavItem key={link.path} item={link} />
         ))}
 
@@ -78,12 +93,20 @@ export const Sidebar = () => {
         <div className="mt-12 mx-2 p-4 rounded-sm border border-outline-variant/30 bg-white shadow-sm">
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <span className="text-[9px] font-bold text-on-surface-variant/40 uppercase tracking-widest">Current Plan</span>
-              <span className="text-[9px] font-black text-secondary uppercase bg-secondary/10 px-2 py-0.5 rounded-full">{user?.plan || 'FREE'}</span>
+              <span className="text-[9px] font-bold text-on-surface-variant/40 uppercase tracking-widest">
+                Current Plan
+              </span>
+              <span className="text-[9px] font-black text-secondary uppercase bg-secondary/10 px-2 py-0.5 rounded-full">
+                {currentPlanLabel}
+              </span>
             </div>
             <div className="pt-2 border-t border-outline-variant/20">
-              <p className="text-xs font-bold text-primary truncate">{user?.fullName || 'Anonymous'}</p>
-              <p className="text-[10px] text-on-surface-variant truncate">{user?.email || ''}</p>
+              <p className="text-xs font-bold text-primary truncate">
+                {user?.fullName || "Anonymous"}
+              </p>
+              <p className="text-[10px] text-on-surface-variant truncate">
+                {user?.email || ""}
+              </p>
             </div>
           </div>
         </div>
@@ -98,10 +121,10 @@ export const Sidebar = () => {
           <LifeBuoy className="w-4 h-4" />
           <span className="text-sm font-medium">Support Center</span>
         </Link>
-        <button 
+        <button
           onClick={() => {
             logout();
-            navigate('/login');
+            navigate("/login");
           }}
           className="flex items-center gap-3 w-full px-4 py-3 text-on-surface-variant hover:text-error transition-colors group"
         >

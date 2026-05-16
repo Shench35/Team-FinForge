@@ -1,12 +1,34 @@
-import { ShieldCheck, Plus } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '../../ui/Button';
+import { ShieldCheck, Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "../../ui/Button";
 
-export const DashboardHeader = ({ user }: { user: any }) => {
+type DemoRole = "regular" | "pro" | "developer";
+
+export const DashboardHeader = ({
+  user,
+  demoRole = "regular",
+}: {
+  user: any;
+  demoRole?: DemoRole;
+}) => {
   const navigate = useNavigate();
-  const userName = user?.firstName || 'User';
-  const planName = user?.plan || 'FREE';
-  const cap = planName === 'ENTERPRISE' ? 'Unlimited' : planName === 'PRO_MAX' ? '20 / mo' : planName === 'PRO' ? '10 / mo' : '3 / mo';
+  const userName = user?.firstName || "User";
+  const derivedPlanName =
+    demoRole === "developer"
+      ? "DEVELOPER"
+      : demoRole === "pro"
+        ? "PRO"
+        : user?.plan || "FREE";
+  const cap =
+    demoRole === "developer" || demoRole === "pro"
+      ? "Unlimited"
+      : derivedPlanName === "ENTERPRISE"
+        ? "Unlimited"
+        : derivedPlanName === "PRO_MAX"
+          ? "20 / mo"
+          : derivedPlanName === "PRO"
+            ? "10 / mo"
+            : "3 / mo";
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
@@ -27,20 +49,18 @@ export const DashboardHeader = ({ user }: { user: any }) => {
           </div>
           <div>
             <p className="text-[9px] font-bold text-on-surface-variant/60 uppercase tracking-widest">
-              Plan: {planName}
+              Plan: {derivedPlanName}
             </p>
-            <p className="text-xl font-display font-bold text-primary">
-              {cap}
-            </p>
+            <p className="text-xl font-display font-bold text-primary">{cap}</p>
           </div>
         </div>
 
         {/* Action Button */}
         <div className="hidden md:block">
-          <Button 
-            variant="primary" 
+          <Button
+            variant="primary"
             className="h-14 px-8 font-bold uppercase tracking-widest text-xs flex items-center gap-2 bg-[#006C4E] hover:bg-[#005a41]"
-            onClick={() => navigate('/verify')}
+            onClick={() => navigate("/verify")}
           >
             <Plus className="w-4 h-4" />
             New Verification

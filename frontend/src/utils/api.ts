@@ -3,7 +3,7 @@ const BASE = "https://fond-dory-suitable.ngrok-free.app";
 interface RequestOptions {
   method: string;
   path: string;
-  body?: unknown;
+  body?: any;
   isMultipart?: boolean;
   baseUrl?: string;
   noAuth?: boolean;

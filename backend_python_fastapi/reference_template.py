@@ -23,7 +23,6 @@ REFERENCE_TEMPLATES = {
             "waec_seal",
             "qr_code",
             "candidate_photo"
-            "SUBJECT RECORDED"
         ],
 
         "required_text_markers": [

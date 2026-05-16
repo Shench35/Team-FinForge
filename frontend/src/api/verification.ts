@@ -1,4 +1,5 @@
 import { request } from "../utils/api";
+import { getBaseUrl } from "../utils/config";
 
 export type PlanType = "PRO" | "PRO_MAX" | "ENTERPRISE";
 export type VerificationStatus =
@@ -33,7 +34,7 @@ const extractResponse = <T>(value: unknown): T => {
   return {} as T;
 };
 
-const DEMO_BASE = "https://junkman-thrash-omission.ngrok-free.dev";
+const DEMO_BASE = getBaseUrl('python');
 
 export interface AIAnalysisResponse {
   success: boolean;
@@ -43,6 +44,7 @@ export interface AIAnalysisResponse {
     candidate_name: string;
     exam_year: string;
     registration_number: string;
+    subjects?: any[];
   };
   flagged_issues?: string[];
   message?: string;

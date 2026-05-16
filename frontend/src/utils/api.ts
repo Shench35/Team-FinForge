@@ -1,4 +1,6 @@
-const BASE = "https://fond-dory-suitable.ngrok-free.app";
+import { getBaseUrl } from "./config";
+
+const BASE = getBaseUrl('node');
 
 interface RequestOptions {
   method: string;

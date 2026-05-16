@@ -1,0 +1,59 @@
+export const PLAN_LIMITS = { PRO: 3, PRO_MAX: 5, ENTERPRISE: 7 } as const;
+
+export const PLAN_LABELS = { PRO: 'Pro', PRO_MAX: 'Pro Max', ENTERPRISE: 'Enterprise' } as const;
+
+export const PLAN_PRICES = { PRO: '₦500', PRO_MAX: '₦750', ENTERPRISE: '₦1,200' } as const;
+
+export const PLAN_COLORS = { PRO: 'blue', PRO_MAX: 'purple', ENTERPRISE: 'green' } as const;
+
+export const PLAN_DOC_FEATURES = {
+  PRO: [
+    '3 documents per session',
+    'Single upload interface',
+    'Standard processing',
+    'Basic PDF report',
+  ],
+  PRO_MAX: [
+    '5 documents per session',
+    'Multi-file drag-and-drop',
+    'Real-time API access',
+    'Institutional branding',
+    'Detailed analytics report',
+  ],
+  ENTERPRISE: [
+    '7 documents per session',
+    'Priority queue processing',
+    'Bulk verification tools',
+    'Dedicated account manager',
+    'Full forensic audit report',
+  ],
+} as const;
+
+export const VERDICT_CONFIG = {
+  LIKELY_AUTHENTIC: { label: 'Likely Authentic', color: '#006c4e', borderClass: 'border-t-4 border-secondary', minScore: 80 },
+  SUSPICIOUS:       { label: 'Suspicious',        color: '#f59e0b', borderClass: 'border-t-4 border-amber-500', minScore: 50 },
+  HIGH_RISK:        { label: 'High Risk',          color: '#ba1a1a', borderClass: 'border-t-4 border-error',    minScore: 0  },
+} as const;
+
+export const SEVERITY_CONFIG = {
+  LOW:    { label: 'Low',    color: '#f59e0b' },
+  MEDIUM: { label: 'Medium', color: '#f97316' },
+  HIGH:   { label: 'High',   color: '#ba1a1a' },
+} as const;
+
+export const VERIFICATION_STATUS_CONFIG = {
+  PENDING_PAYMENT:   { label: 'Pending Payment',   color: 'gray'  },
+  PAYMENT_CONFIRMED: { label: 'Payment Confirmed', color: 'blue'  },
+  PROCESSING:        { label: 'Processing',        color: 'amber', pulse: true },
+  COMPLETED:         { label: 'Completed',         color: 'green' },
+  FAILED:            { label: 'Failed',            color: 'red'   },
+} as const;
+
+export const PROCESSING_STEPS = [
+  { id: 1, label: 'Payment confirmed',           icon: 'check_circle' },
+  { id: 2, label: 'Uploading documents',         icon: 'upload'       },
+  { id: 3, label: 'Running OCR extraction',      icon: 'text_fields'  },
+  { id: 4, label: 'Analysing with GPT-4 Vision', icon: 'psychology'   },
+  { id: 5, label: 'Calculating trust score',     icon: 'analytics'    },
+  { id: 6, label: 'Generating report',           icon: 'description'  },
+] as const;

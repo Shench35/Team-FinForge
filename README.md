@@ -2,16 +2,7 @@
 
 **Squad Hackathon 3.0 | Challenge 01 — Proof of Life (Education Domain)**
 
----
-
-## Quick Start (30 seconds)
-
-CertVerify detects fraudulent academic certificates in **15 seconds** using AI and forensic analysis. Upload a WAEC or NECO certificate → Get a trust verdict (AUTHENTIC, SUSPICIOUS, HIGH_RISK) → View detailed analysis.
-
-**Live Demo:** `http://localhost:5173` (after setup)  
-**API Docs:** `http://localhost:8000/docs`
-
----
+------
 
 ## Table of Contents
 
